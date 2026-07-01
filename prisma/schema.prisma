@@ -4,7 +4,7 @@
 // Get a free hosted Postgres database in seconds: `npx create-db`
 
 generator client {
-  provider = "prisma-client"
+  provider = "prisma-client-js"
   output   = "../src/generated/prisma"
 }
 
@@ -23,10 +23,87 @@ model User {
   updatedAt DateTime  @updatedAt
   deletedAt DateTime?
 
-  nickname  String
-  password  String
-  email     String    @unique
+  nickname String
+  password String
+  email    String @unique
 
   birthdate String?
-  role      RoleType  @default(USER)
+  role      RoleType @default(USER)
+}
+
+model WalkLog {
+  id Int @id @default(autoincrement())
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  walkDate  DateTime
+  startTime DateTime
+  endTime   DateTime
+
+  duration Int
+  distance Float?
+
+  memo  String?
+  petId Int
+
+  @@index([petId])
+  @@index([walkDate])
+}
+
+model VetRecord {
+  id Int @id @default(autoincrement())
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  visitDate    DateTime
+  hospitalName String
+  visitPurpose String
+  diagnosis    String?
+  treatment    String?
+  cost         Int?
+  receiptImage String?
+  memo         String?
+  petId        Int
+
+  @@index([petId])
+  @@index([visitDate])
+}
+
+model WeightLog {
+  id Int @id @default(autoincrement())
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  recordDate DateTime // 몸무게를  측정한 날짜
+  weight     Float // 몸무게
+
+  memo  String?
+  petId Int // 어떤 반려동물인지
+
+  @@index([petId])
+  @@index([recordDate])
+}
+
+// 음수량에 대한 테이블
+model WaterLog {
+  id Int @id @default(autoincrement())
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  recordDate DateTime
+  amount     Int
+
+  memo  String?
+  petId Int
+
+  @@index([petId])
+  @@index([recordDate])
 }
