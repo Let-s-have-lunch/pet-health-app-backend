@@ -1,6 +1,6 @@
 import { inquiriesTable, Inquiry } from "./InquiryModel"; // 💡 마침표 하나 규칙!
 
-export class InquiryService {
+export class CommunityService {
     // 1. [일반 유저] 1:1 문의 등록
     createInquiry(userId: number, title: string, content: string): Inquiry {
         const newInquiry: Inquiry = {
