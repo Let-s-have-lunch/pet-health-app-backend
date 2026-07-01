@@ -1,5 +1,9 @@
 import dotenv from "dotenv";
 import express from "express";
+import userRouter from "./routes/userRouter.ts";
+import noticeRouter from "./routes/noticeRouter.ts";
+import adminRouter from "./routes/admin/adminRouter.ts";
+import inquiryRouter from "./routes/inquiryRouter.ts";
 
 dotenv.config();
 
@@ -12,6 +16,9 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 app.use("/user", userRouter);
+app.use("/notice", noticeRouter);
+app.use("/inquiry", inquiryRouter);
+app.use("/admin", adminRouter);
 
 app.listen(PORT, () => {
     console.log(`서버 실행됨! http://localhost:${PORT}`);
