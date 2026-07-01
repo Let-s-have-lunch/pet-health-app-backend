@@ -12,5 +12,5 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 app.listen(PORT, () => {
-    console.log("서버 실행됨! http://localhost:${PORT}");
+    console.log(`서버 실행됨! http://localhost:${PORT}`);
 });
