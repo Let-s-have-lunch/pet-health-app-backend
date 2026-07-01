@@ -11,6 +11,8 @@ app.use(express.json());
 
 app.use(express.urlencoded({ extended: true }));
 
+app.use("/user", userRouter);
+
 app.listen(PORT, () => {
     console.log(`서버 실행됨! http://localhost:${PORT}`);
 });

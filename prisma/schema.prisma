@@ -23,10 +23,10 @@ model User {
   updatedAt DateTime  @updatedAt
   deletedAt DateTime?
 
-  nickname  String
-  password  String
-  email     String    @unique
+  nickname String @unique
+  password String
+  email    String @unique
 
   birthdate String?
-  role      RoleType  @default(USER)
+  role      RoleType @default(USER)
 }
