@@ -1,69 +1,101 @@
-import { inquiriesTable, Inquiry } from "./InquiryModel"; // 💡 마침표 하나 규칙!
+// src/service/Community.service.ts
+import { PrismaClient } from "@prisma/client";
+
+const prisma = new PrismaClient();
 
 export class CommunityService {
-    // 1. [일반 유저] 1:1 문의 등록
-    createInquiry(userId: number, title: string, content: string): Inquiry {
-        const newInquiry: Inquiry = {
-            id: inquiriesTable.length + 1,
-            userId,
-            title,
-            content,
-            status: "PENDING",
-            answerContent: null,
-            answeredAt: null,
-            createdAt: new Date(),
-        };
-        inquiriesTable.push(newInquiry);
-        return newInquiry;
+    // ==========================================
+    // 1. 일반 유저 기능 (게시글 & 댓글)
+    // ==========================================
+
+    // 📝 [게시글 작성]
+    async createPost(userId: number, title: string, content: string) {
+        return await prisma.communityPost.create({
+            data: { userId, title, content },
+        });
     }
 
-    // 2. [일반 유저] 본인 문의 내역 조회 (최신순 정렬)
-    getMyInquiries(userId: number): Inquiry[] {
-        return inquiriesTable
-            .filter((inquiry: Inquiry) => inquiry.userId === userId)
-            .sort((a: Inquiry, b: Inquiry) => b.createdAt.getTime() - a.createdAt.getTime());
+    // 📋 [게시글 목록 조회] - 페이징 처리 + 댓글 수 포함 (풍성함의 핵심! ⭐)
+    async getPosts(limit: number, offset: number) {
+        const [total, list] = await prisma.$transaction([
+            prisma.communityPost.count({ where: { isHidden: false, deletedAt: null } }),
+            prisma.communityPost.findMany({
+                where: { isHidden: false, deletedAt: null },
+                take: limit,
+                skip: offset,
+                orderBy: { createdAt: "desc" },
+                include: {
+                    _count: {
+                        select: { replies: true }, // 💡 글 목록 볼 때 댓글이 몇 개 달렸는지 같이 가져오는 센스!
+                    },
+                },
+            }),
+        ]);
+
+        return { total, list };
     }
 
-    // 3. 🛠️ [어드민 기능] 1:1 문의 답변 등록 (명세서 요구사항 3종 반영)
-    answerInquiry(inquiryId: number, answerContent: string): Inquiry {
-        const inquiry = inquiriesTable.find((inquiryItem: Inquiry) => inquiryItem.id === inquiryId);
-        if (!inquiry) throw new Error("해당 문의 내역을 찾을 수 없습니다.");
+    // 🔍 [게시글 상세 조회] - 조회수 중복 클릭 방지 로직 연동
+    async getPostDetail(postId: number, shouldIncrement: boolean) {
+        if (shouldIncrement) {
+            // 중복 클릭이 아닐 때만 Prisma로 MySQL 조회수 1 증가!
+            await prisma.communityPost.update({
+                where: { id: postId },
+                data: { viewCount: { increment: 1 } },
+            });
+        }
 
-        inquiry.answerContent = answerContent; // ① answer_content 작성
-        inquiry.status = "ANSWERED"; // ② 상태를 ANSWERED로 변경
-        inquiry.answeredAt = new Date(); // ③ 답변일 업데이트
-
-        return inquiry;
-    }
-
-    // 4. 🛠️ [추가 어드민 기능] 어드민용 전체 문의 목록 조회 (페이징 + 필터링)
-    // 명세서의 "페이징 확장"과 "어드민 기능"을 위해 답변 대기중(PENDING)인 것부터 먼저 보여주는 로직입니다.
-    getAllInquiriesForAdmin(page: number, limit: number) {
-        const startIndex = (page - 1) * limit;
-
-        // 대기중(PENDING)인 급한 문의를 위로, 그다음 최신순으로 정렬하는 고급 로직
-        const sorted = [...inquiriesTable].sort((a, b) => {
-            if (a.status === "PENDING" && b.status === "ANSWERED") return -1;
-            if (a.status === "ANSWERED" && b.status === "PENDING") return 1;
-            return b.createdAt.getTime() - a.createdAt.getTime();
+        const post = await prisma.communityPost.findUnique({
+            where: { id: postId },
+            include: {
+                replies: {
+                    where: { isHidden: false, deletedAt: null },
+                    orderBy: { createdAt: "asc" }, // 댓글은 오래된 순(작성 순) 정렬이 기본!
+                },
+            },
         });
 
-        const totalPages = Math.ceil(inquiriesTable.length / limit) || 1;
+        if (!post || post.isHidden || post.deletedAt) {
+            throw new Error("존재하지 않거나 블록된 게시글입니다.");
+        }
 
-        return {
-            inquiries: sorted.slice(startIndex, startIndex + limit),
-            totalPages,
-        };
+        return post;
     }
 
-    // 5. 🛠️ [추가 어드민 기능] 규정 위반이거나 부적절한 문의글 어드민 권한 삭제/숨김
-    // 명세서의 "어드민 권한으로 숨김 또는 삭제 처리" 공통 요구사항을 완벽 적용했습니다.
-    deleteInquiryByAdmin(inquiryId: number): { message: string } {
-        const index = inquiriesTable.findIndex((i:Inquiry) => i.id === inquiryId);
+    // 💬 [댓글 작성]
+    async createReply(userId: number, postId: number, content: string) {
+        // 먼저 해당 게시글이 실존하는지 체크
+        const post = await prisma.communityPost.findUnique({ where: { id: postId } });
+        if (!post) throw new Error("댓글을 달 게시글이 존재하지 않습니다.");
 
-        if (index === -1) throw new Error("삭제할 문의 내역이 없습니다.");
+        return await prisma.reply.create({
+            data: { userId, postId, content },
+        });
+    }
 
-        inquiriesTable.splice(index, 1); // 배열에서 진짜로 삭제 처리
-        return { message: "어드민 권한으로 문의 내역이 완전히 삭제되었습니다." };
+    // ==========================================
+    // 2. 🛠️ [어드민 기능] 가이드라인 위반 처리 (Soft Delete)
+    // ==========================================
+
+    // 🚫 [어드민] 게시글 숨김/삭제 처리
+    async hidePostByAdmin(postId: number) {
+        const post = await prisma.communityPost.findUnique({ where: { id: postId } });
+        if (!post) throw new Error("해당 게시글을 찾을 수 없습니다.");
+
+        return await prisma.communityPost.update({
+            where: { id: postId },
+            data: { isHidden: true }, // 진짜 DELETE 대신 숨김(Soft Delete) 처리!
+        });
+    }
+
+    // 🚫 [어드민] 댓글 숨김/삭제 처리 (💡 라우터 보완 사항 수용!)
+    async hideReplyByAdmin(replyId: number) {
+        const reply = await prisma.reply.findUnique({ where: { id: replyId } });
+        if (!reply) throw new Error("해당 댓글을 찾을 수 없습니다.");
+
+        return await prisma.reply.update({
+            where: { id: replyId },
+            data: { isHidden: true },
+        });
     }
 }
