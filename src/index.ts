@@ -6,6 +6,7 @@ import noticeRouter from "./routes/noticeRouter.ts";
 import adminRouter from "./routes/admin/adminRouter.ts";
 import inquiryRouter from "./routes/inquiryRouter.ts";
 import walkLogRouter from "./routes/walkLogRouter.ts";
+import communityPostRouter from "./routes/admin/post/communityPostRouter.ts";
 
 dotenv.config();
 
@@ -24,6 +25,7 @@ app.use("/notice", noticeRouter);
 app.use("/inquiry", inquiryRouter);
 app.use("/admin", adminRouter);
 app.use("/walk-logs",walkLogRouter)
+app.use("/post", communityPostRouter);
 
 app.listen(PORT, () => {
     console.log(`서버 실행됨! http://localhost:${PORT}`);

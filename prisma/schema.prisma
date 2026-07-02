@@ -33,10 +33,11 @@ model User {
   password String
   email    String @unique
 
-  birthdate DateTime
-  role      RoleType  @default(USER)
-  pets      Pet[]
-  inquiries Inquiry[]
+  birthdate      DateTime?
+  role           RoleType        @default(USER)
+  pets           Pet[]
+  inquiries      Inquiry[]
+  communityPosts CommunityPost[]
 }
 
 model Pet {
@@ -200,4 +201,18 @@ model WaterLog {
 
   @@index([petId])
   @@index([recordDate])
+}
+
+model CommunityPost {
+  id        Int       @id @default(autoincrement())
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+  title     String
+  content   String    @db.Text
+  views     Int       @default(0)
+  userId    Int
+  user      User      @relation(fields: [userId], references: [id])
+
+  @@index([userId])
 }
