@@ -1,5 +1,5 @@
 import { Router } from "express";
-import * as walkLogController from "../controllers/walk-log.controller.ts";
+import * as walkLogController from "../controllers/walkLogController.ts";
 
 const router = Router();
 

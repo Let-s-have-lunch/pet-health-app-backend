@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import inquiryService from "../../service/inquiryService.ts";
-import { InquiryAnswerInputType } from "../../schemas/admin/inquiry/inquiryAnswerSchema.ts";
+import { InquiryAnswerInputType } from "../../schemas/inquiry/inquiryAnswerSchema.ts";
 
 const getInquiryList = async (req: Request, res: Response) => {
     try {

@@ -1,7 +1,7 @@
 import { Response } from "express";
 import { AuthRequest } from "../middlewares/auth.ts";
 import inquiryService from "../service/inquiryService.ts";
-import { InquiryInputType } from "../schemas/user/inquiry/inquirySchema.ts";
+import { InquiryInputType } from "../schemas/inquiry/inquirySchema.ts";
 
 const getInquiryList = async (req: AuthRequest, res: Response) => {
     try {

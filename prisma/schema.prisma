@@ -34,8 +34,9 @@ model User {
   email    String @unique
 
   birthdate DateTime
-  role      UserRole @default(USER)
+  role      RoleType  @default(USER)
   pets      Pet[]
+  inquiries Inquiry[]
 }
 
 model Pet {
@@ -86,14 +87,14 @@ model Todo {
   isCompleted Boolean  @default(false)
   createdAt   DateTime @default(now())
 
-  petId Int
-  pet   Pet @relation(fields: [petId], references: [id])
-
-  @@index([petId])
+  petId     Int
+  pet       Pet       @relation(fields: [petId], references: [id])
   birthdate DateTime?
   role      RoleType  @default(USER)
 
   inquiries Inquiry[]
+
+  @@index([petId])
 }
 
 model Notice {
@@ -114,6 +115,8 @@ model Inquiry {
   answeredAt DateTime?
   userId     Int
   user       User      @relation(fields: [userId], references: [id])
+  todo       Todo?     @relation(fields: [todoId], references: [id])
+  todoId     Int?
 
   @@index([userId])
 }

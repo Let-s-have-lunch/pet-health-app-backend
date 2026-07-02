@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { validate } from "../../../middlewares/validate.ts";
-import { inquiryAnswerSchema } from "../../../schemas/admin/inquiry/inquiryAnswerSchema.ts";
+import { inquiryAnswerSchema } from "../../../schemas/inquiry/inquiryAnswerSchema.ts";
 import adminInquiryController from "../../../controller/admin/adminInquiryController.ts";
 
 const router = Router();

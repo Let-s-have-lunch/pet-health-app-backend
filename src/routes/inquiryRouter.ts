@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { authenticate } from "../middlewares/auth.ts";
 import { validate } from "../middlewares/validate.ts";
-import { inquirySchema } from "../schemas/user/inquiry/inquirySchema.ts";
+import { inquirySchema } from "../schemas/inquiry/inquirySchema.ts";
 import inquiryController from "../controller/inquiryController.ts";
 
 const router = Router();
