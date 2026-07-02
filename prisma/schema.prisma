@@ -92,8 +92,6 @@ model Todo {
   birthdate DateTime?
   role      RoleType  @default(USER)
 
-  inquiries Inquiry[]
-
   @@index([petId])
 }
 
@@ -115,8 +113,6 @@ model Inquiry {
   answeredAt DateTime?
   userId     Int
   user       User      @relation(fields: [userId], references: [id])
-  todo       Todo?     @relation(fields: [todoId], references: [id])
-  todoId     Int?
 
   @@index([userId])
 }
