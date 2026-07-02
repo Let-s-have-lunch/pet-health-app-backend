@@ -5,6 +5,8 @@ import userRouter from "./routes/userRouter.ts";
 import noticeRouter from "./routes/noticeRouter.ts";
 import adminRouter from "./routes/admin/adminRouter.ts";
 import inquiryRouter from "./routes/inquiryRouter.ts";
+import walkLogRouter from "./routes/walkLogRouter.ts";
+import communityPostRouter from "./routes/admin/post/communityPostRouter.ts";
 import petRouter from "./routes/petRouter.ts";
 
 dotenv.config();
@@ -23,6 +25,8 @@ app.use("/user", userRouter);
 app.use("/notice", noticeRouter);
 app.use("/inquiry", inquiryRouter);
 app.use("/admin", adminRouter);
+app.use("/walk-logs",walkLogRouter)
+app.use("/post", communityPostRouter);
 
 app.use("/pet", petRouter);
 
