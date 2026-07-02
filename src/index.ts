@@ -5,14 +5,13 @@ import userRouter from "./routes/userRouter.ts";
 import noticeRouter from "./routes/noticeRouter.ts";
 import adminRouter from "./routes/admin/adminRouter.ts";
 import inquiryRouter from "./routes/inquiryRouter.ts";
+import communityPostRouter from "./routes/admin/post/communityPostRouter.ts";
 
 dotenv.config();
 
 const app = express();
 
 const PORT = process.env.PORT || "8080";
-
-
 
 app.use(express.json());
 
@@ -22,7 +21,7 @@ app.use("/user", userRouter);
 app.use("/notice", noticeRouter);
 app.use("/inquiry", inquiryRouter);
 app.use("/admin", adminRouter);
-
+app.use("/post", communityPostRouter);
 
 app.listen(PORT, () => {
     console.log(`서버 실행됨! http://localhost:${PORT}`);
