@@ -1,6 +1,5 @@
 import dotenv from "dotenv";
 import express from "express";
-import walkLogRouter from "./routes/walkLogRouter.ts";
 
 import userRouter from "./routes/userRouter.ts";
 import noticeRouter from "./routes/noticeRouter.ts";
@@ -13,6 +12,8 @@ const app = express();
 
 const PORT = process.env.PORT || "8080";
 
+
+
 app.use(express.json());
 
 app.use(express.urlencoded({ extended: true }));
@@ -22,7 +23,6 @@ app.use("/notice", noticeRouter);
 app.use("/inquiry", inquiryRouter);
 app.use("/admin", adminRouter);
 
-app.use("/walk-logs",walkLogRouter);
 
 app.listen(PORT, () => {
     console.log(`서버 실행됨! http://localhost:${PORT}`);
