@@ -1,5 +1,24 @@
-import {CreateWalkLogDto} from "../dto/walk-log.dto.ts";
-import * as walkLogRepository from "../repositories/walk-log.repository.ts";
+import { PrismaClient } from "@prisma/client";
 
-export const createWalkLog = async (data: CreateWalkLogDto) => {
-    return await walkLogRepository.createWalkLog(data);}
+const prisma = PrismaClient();
+
+export class WalkLogService {
+    // 산책 기록 생성
+    createLog = async (userId: number, distance: number, time: number) => {
+        return await prisma.walkLog.create({
+            data: {
+                userId,
+                distance,
+                time
+            },
+        });
+    };
+
+    // 내 기록들 가져오기
+    getMyLogs = async (userId: number) => {
+        return await prisma.walkLog.findMany({
+            where: { userId },
+            orderBy: { createdAt: "desc" },
+        });
+    };
+}

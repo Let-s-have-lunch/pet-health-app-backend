@@ -37,6 +37,7 @@ model User {
   role      RoleType  @default(USER)
   pets      Pet[]
   inquiries Inquiry[]
+  walkLogs  WalkLog[]
 }
 
 model Pet {
@@ -124,9 +125,14 @@ model Inquiry {
 model WalkLog {
   id Int @id @default(autoincrement())
 
+  time   Int
+  userId Int
+
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
   deletedAt DateTime?
+
+  user User @relation(fields: [userId], references: [id]) //
 
   walkDate  DateTime
   startTime DateTime
@@ -196,4 +202,25 @@ model WaterLog {
 
   @@index([petId])
   @@index([recordDate])
+}
+
+model Post {
+  id        Int      @id @default(autoincrement())
+  title     String
+  content   String
+  userId    Int
+  replies   Reply[] // 💡 게시글 하나에 여러 댓글이 달릴 수 있음!
+  createdAt DateTime @default(now())
+}
+
+model Reply {
+  id        Int      @id @default(autoincrement())
+  content   String
+  userId    Int
+  postId    Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // 💡 외래키 설정: 이 댓글이 어느 게시글에 속하는지 명시
+  post Post @relation(fields: [postId], references: [id])
 }

@@ -1,11 +1,12 @@
 import dotenv from "dotenv";
 import express from "express";
-import walkLogRouter from "./routes/walkLogRouter.ts";
+import walkLogRouter from "./routes/walkLogRoute.ts";
 
 import userRouter from "./routes/userRouter.ts";
 import noticeRouter from "./routes/noticeRouter.ts";
 import adminRouter from "./routes/admin/adminRouter.ts";
 import inquiryRouter from "./routes/inquiryRouter.ts";
+import replyRouter from "./routes/replyRoute.ts";
 
 dotenv.config();
 
@@ -23,6 +24,8 @@ app.use("/inquiry", inquiryRouter);
 app.use("/admin", adminRouter);
 
 app.use("/walk-logs",walkLogRouter);
+
+app.use("/replies", replyRouter);
 
 app.listen(PORT, () => {
     console.log(`서버 실행됨! http://localhost:${PORT}`);
