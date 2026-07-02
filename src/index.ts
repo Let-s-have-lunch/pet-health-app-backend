@@ -1,6 +1,6 @@
 import dotenv from "dotenv";
 import express from "express";
-import walkLogRouter from "./routes/walk-log.route.ts";
+import walkLogRouter from "./routes/walkLogRouter.ts";
 
 import userRouter from "./routes/userRouter.ts";
 import noticeRouter from "./routes/noticeRouter.ts";

@@ -1,6 +1,4 @@
 import {Request, Response} from "express";
-import { CreateWalkLogDto } from "../dto/walk-log.dto.ts";
-import * as walkLogService from "../services/walk-log.service.ts";
 
 
 export const createWalkLog = async (req: Request ,res: Response) => {
