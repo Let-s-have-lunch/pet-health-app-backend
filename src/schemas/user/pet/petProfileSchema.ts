@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { PetGender } from "../../generated/prisma/enums.ts";
+import { PetGender } from "prisma-client-240f49b30f9038da4ebed3b00d6405585fbcced093b81a7de5cedecb05d4c32f/enums.ts";
 
 export const PetProfileSchema = z.object({
     species: z.string().min(1, "동물종을 선택해주세요."),
