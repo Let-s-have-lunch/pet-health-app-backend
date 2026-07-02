@@ -1,63 +1,67 @@
-import { Router, Request, Response } from "express";
-import { Communityservice } from "../services/Communityservice.ts";
+// src/controller/Community.controller.ts
+import { Request, Response } from "express";
+import { CommunityService } from "../services/Communityservice"; // 서비스 경로 확인 필요
 
-const router = Router();
-const communityService = new Communityservice();
+export default class CommunityController {
+    private communityService = new CommunityService();
 
-// 게시글 작성 통로
-router.post("/posts", async (req: Request, res: Response) => {
-    try {
-        const { userId, title, content } = req.body;
-        const post = await communityService.createPost(Number(userId), title, content);
-        res.status(201).json(post);
-    } catch (error: any) {
-        res.status(500).json({ message: error.message });
-    }
-});
+    // 1. 게시글 작성
+    createPost = async (req: Request, res: Response) => {
+        try {
+            const { userId, title, content } = req.body;
+            const post = await this.communityService.createPost(Number(userId), title, content);
+            res.status(201).json(post);
+        } catch (error: any) {
+            res.status(500).json({ message: error.message });
+        }
+    };
 
-// 게시글 목록 조회 통로 (페이징 query 처리)
-router.get("/posts", async (req: Request, res: Response) => {
-    try {
-        const page = Number(req.query.page) || 1;
-        const limit = Number(req.query.limit) || 10;
-        const result = await communityService.getPosts(page, limit);
-        res.json(result);
-    } catch (error: any) {
-        res.status(500).json({ message: error.message });
-    }
-});
+    // 2. 게시글 목록 조회
+    getPosts = async (req: Request, res: Response) => {
+        try {
+            const page = Number(req.query.page) || 1;
+            const limit = Number(req.query.limit) || 10;
+            const result = await this.communityService.getPosts(page, limit);
+            res.json(result);
+        } catch (error: any) {
+            res.status(500).json({ message: error.message });
+        }
+    };
 
-// 게시글 상세 보기 통로
-router.get("/posts/:id", async (req: Request, res: Response) => {
-    try {
-        const postId = Number(req.params.id);
-        const post = await communityService.getPostById(postId);
-        res.json(post);
-    } catch (error: any) {
-        res.status(500).json({ message: error.message });
-    }
-});
+    // 3. 게시글 상세 보기
+    getPostById = async (req: Request, res: Response) => {
+        try {
+            const postId = Number(req.params.id);
+            const post = await this.communityService.getPostDetail(postId, true);
+            res.json(post);
+        } catch (error: any) {
+            res.status(500).json({ message: error.message });
+        }
+    };
 
-// 댓글 작성 통로
-router.post("/replies", async (req: Request, res: Response) => {
-    try {
-        const { userId, postId, content } = req.body;
-        const reply = await communityService.createReply(Number(userId), Number(postId), content);
-        res.status(201).json(reply);
-    } catch (error: any) {
-        res.status(500).json({ message: error.message });
-    }
-});
+    // 4. 댓글 작성
+    createReply = async (req: Request, res: Response) => {
+        try {
+            const { userId, postId, content } = req.body;
+            const reply = await this.communityService.createReply(
+                Number(userId),
+                Number(postId),
+                content,
+            );
+            res.status(201).json(reply);
+        } catch (error: any) {
+            res.status(500).json({ message: error.message });
+        }
+    };
 
-// [어드민] 게시글 숨김 통로
-router.delete("/admin/posts/:id", async (req: Request, res: Response) => {
-    try {
-        const postId = Number(req.params.id);
-        await communityService.adminDeletePost(postId);
-        res.json({ message: "어드민 권한으로 처리되었습니다." });
-    } catch (error: any) {
-        res.status(500).json({ message: error.message });
-    }
-});
-
-export default Router;
+    // 5. [어드민] 게시글 숨김 (delete 대신 hide 로직 사용)
+    hidePost = async (req: Request, res: Response) => {
+        try {
+            const postId = Number(req.params.id);
+            await this.communityService.hidePostByAdmin(postId);
+            res.json({ message: "어드민 권한으로 게시글이 숨김 처리되었습니다." });
+        } catch (error: any) {
+            res.status(500).json({ message: error.message });
+        }
+    };
+}
