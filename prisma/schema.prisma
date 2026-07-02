@@ -54,8 +54,12 @@ model Pet {
   updatedAt DateTime  @updatedAt
   deletedAt DateTime?
 
-  diaries Diary[]
-  todos   Todo[]
+  diaries    Diary[]
+  todos      Todo[]
+  walkLogs   WalkLog[]
+  vetRecords VetRecord[]
+  weightLogs WeightLog[]
+  waterLogs  WaterLog[]
 
   userId Int
   user   User @relation(fields: [userId], references: [id])
@@ -92,8 +96,6 @@ model Todo {
   birthdate DateTime?
   role      RoleType  @default(USER)
 
-  inquiries Inquiry[]
-
   @@index([petId])
 }
 
@@ -115,8 +117,6 @@ model Inquiry {
   answeredAt DateTime?
   userId     Int
   user       User      @relation(fields: [userId], references: [id])
-  todo       Todo?     @relation(fields: [todoId], references: [id])
-  todoId     Int?
 
   @@index([userId])
 }
@@ -137,6 +137,7 @@ model WalkLog {
 
   memo  String?
   petId Int
+  pet   Pet     @relation(fields: [petId], references: [id])
 
   @@index([petId])
   @@index([walkDate])
@@ -158,6 +159,7 @@ model VetRecord {
   receiptImage String?
   memo         String?
   petId        Int
+  pet          Pet      @relation(fields: [petId], references: [id])
 
   @@index([petId])
   @@index([visitDate])
@@ -175,6 +177,7 @@ model WeightLog {
 
   memo  String?
   petId Int // 어떤 반려동물인지
+  pet   Pet     @relation(fields: [petId], references: [id])
 
   @@index([petId])
   @@index([recordDate])
@@ -193,6 +196,7 @@ model WaterLog {
 
   memo  String?
   petId Int
+  pet   Pet     @relation(fields: [petId], references: [id])
 
   @@index([petId])
   @@index([recordDate])
