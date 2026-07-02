@@ -5,6 +5,7 @@ import userRouter from "./routes/userRouter.ts";
 import noticeRouter from "./routes/noticeRouter.ts";
 import adminRouter from "./routes/admin/adminRouter.ts";
 import inquiryRouter from "./routes/inquiryRouter.ts";
+import petRouter from "./routes/petRouter.ts";
 
 dotenv.config();
 
@@ -23,6 +24,7 @@ app.use("/notice", noticeRouter);
 app.use("/inquiry", inquiryRouter);
 app.use("/admin", adminRouter);
 
+app.use("/pet", petRouter);
 
 app.listen(PORT, () => {
     console.log(`서버 실행됨! http://localhost:${PORT}`);
