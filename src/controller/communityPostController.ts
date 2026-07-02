@@ -1,7 +1,9 @@
 import { Request, Response } from "express";
 import { AuthRequest } from "../middlewares/auth.ts";
 import communityPostService from "../service/communityPostService.ts";
-import { CommunityPostInputType } from "../schemas/post/communityPostSchema.ts";
+import {
+    CommunityPostInputType,
+} from "../schemas/post/communityPostSchema.ts";
 
 const getPostList = async (req: Request, res: Response) => {
     try {
@@ -18,7 +20,7 @@ const getPostList = async (req: Request, res: Response) => {
         console.error(error);
         res.status(500).json({ message: "게시글 목록 조회 중 서버 에러가 발생했습니다." });
     }
-};
+}
 
 const getPostById = async (req: Request<{ postId: string }>, res: Response) => {
     try {
@@ -63,7 +65,7 @@ const createPost = async (req: AuthRequest, res: Response) => {
     }
 };
 
-const updatePost = async (req: AuthRequest<{ postId: string }>, res: Response) => {
+const updatePost = async (req: AuthRequest<{postId: string}>, res: Response) => {
     try {
         const postId = Number(req.params.postId);
         if (isNaN(postId)) {
@@ -97,7 +99,7 @@ const updatePost = async (req: AuthRequest<{ postId: string }>, res: Response) =
     }
 };
 
-const deletePost = async (req: AuthRequest<{ postId: string }>, res: Response) => {
+const deletePost = async (req: AuthRequest<{postId: string}>, res: Response) => {
     try {
         const postId = Number(req.params.postId);
         if (isNaN(postId)) {
@@ -131,5 +133,7 @@ const deletePost = async (req: AuthRequest<{ postId: string }>, res: Response) =
         res.status(500).json({ message: "게시글 삭제 중 서버 에러가 발생했습니다." });
     }
 };
+
+
 
 export default { getPostList, getPostById, createPost, updatePost, deletePost };
