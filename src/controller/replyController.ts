@@ -1,68 +1,120 @@
-import { Request, Response } from "express";
-import { AuthenticatedRequest} from "../middlewares/authmiddleware.ts";
-import { ReplyService } from "../service/replyService";
+import { Response, Request } from "express";
+import { AuthenticatedRequest } from "../middlewares/authmiddleware";
+import replyService from "../service/replyService";
 
 export class ReplyController {
-    private replyService = new ReplyService();
-
-    // 1. 댓글 작성 (기존)
-    create = async (req: Request, res: Response) => {
+    // 1. 댓글 작성 (POST /create)
+    createReply = async (req: AuthenticatedRequest, res: Response) => {
         try {
+
+            if (!req.user) {
+                return res.status(401).json({ message: "로그인이 필요한 서비스입니다." });
+            }
+            const userId = req.user.id;
             const { postId, content } = req.body;
-            const userId = (req as AuthenticatedRequest).user?.id; // 미들웨어에서 넣은 ID
-            // 내용 없는지 체크하는 안전장치
-            if (!userId) {
-                return res.status(401).json({ message: "로그인이 필요합니다." });
+
+            const result = await replyService.createReply(Number(userId), Number(postId), content);
+
+            // 💡 성공 메시지와 데이터 배달
+            return res.status(201).json({
+                message: "댓글이 성공적으로 작성되었습니다.",
+                data: result,
+            });
+        } catch (error: any) {
+            // 💡 서비스 파일에서 던진 에러 메시지(`NOT_FOUND`) 처리
+            if (error.message === "NOT_FOUND") {
+                return res.status(404).json({ message: "존재하지 않거나 삭제된 게시물입니다." });
+            }
+            console.error(error);
+            return res.status(500).json({ message: "댓글 등록 중 서버 오류가 발생되었습니다." });
+        }
+    };
+
+    // 2. 댓글 조회 (GET /:postId)
+    getRepliesByPost = async (req: Request<{ postId: string }>, res: Response) => {
+        try {
+            const postId = Number(req.params.postId);
+
+
+            if (isNaN(postId)) {
+                return res.status(400).json({ message: "유효하지 않은 게시물 ID 입니다." });
             }
 
-            const reply = await this.replyService.createReply(userId, postId, content);
-            res.status(201).json(reply);
-        } catch (error: any) {
-            res.status(500).json({ message: error.message });
+            const page = Number(req.query.page) || 1;
+            const size = Number(req.query.size) || 10;
+
+            const result = await replyService.getRepliesByPostId(postId, page, size);
+
+            return res.status(200).json({
+                message: "댓글 목록을 성공적으로 불러왔습니다.",
+                data: result,
+            });
+        } catch (error) {
+            console.error(error);
+            return res
+                .status(500)
+                .json({ message: "댓글 목록을 불러오는 중에 오류가 발생했습니다." });
         }
     };
 
-    // 2. [추가] 특정 게시글의 댓글 목록 조회
-    getRepliesByPost = async (req: Request, res: Response) => {
+    // 3. 댓글 수정 (PATCH /:replyId)
+    update = async (req: AuthenticatedRequest & Request<{ replyId: string }>, res: Response) => {
         try {
-            const { postId } = req.params;
-            const replies = await this.replyService.getRepliesByPost(Number(postId));
-            res.json(replies);
-        } catch (error: any) {
-            res.status(500).json({ message: error.message });
-        }
-    };
+            // 💡 라우터와 맞춘 변수 이름 :replyId 적용!
+            const id = Number(req.params.replyId);
+            if (isNaN(id)) {
+                return res.status(400).json({ message: "유효하지 않은 댓글 ID 입니다." });
+            }
 
-    // 3. 댓글 수정 (수정 완료!)
-    update = async (req: AuthenticatedRequest, res: Response) => {
-        // Request를 AuthenticatedRequest로 변경
-        try {
-            const { id } = req.params;
+            if (!req.user) {
+                return res.status(401).json({ message: "로그인이 필요한 서비스입니다." });
+            }
+            const userId = req.user.id;
             const { content } = req.body;
-            const userId = req.user!.id; // 토큰에서 가져온 작성자 ID
 
-            // userId를 인자로 추가 전달
-            const reply = await this.replyService.updateReply(Number(id), userId, content);
-            res.json(reply);
+            const result = await replyService.updateReply(id, userId, content);
+
+            return res.status(200).json({
+                message: "댓글이 성공적으로 수정되었습니다.",
+                data: result,
+            });
         } catch (error: any) {
-            // 본인 확인 실패 시 403(권한 없음) 에러 전달
-            res.status(403).json({ message: error.message });
+            if (error.message === "NOT_FOUND_REPLY") {
+                return res.status(404).json({ message: "존재하지 않는 댓글입니다." });
+            }
+            if (error.message === "FORBIDDEN") {
+                return res.status(403).json({ message: "댓글 수정 권한이 없습니다." });
+            }
+            console.error(error);
+            return res.status(500).json({ message: "댓글 수정 중 서버 오류가 발생되었습니다." });
         }
     };
 
-    // 4. 댓글 삭제 (수정 완료!)
-    delete = async (req: AuthenticatedRequest, res: Response) => {
-        // Request를 AuthenticatedRequest로 변경
+    // 4. 댓글 삭제 (DELETE /:replyId)
+    delete = async (req: AuthenticatedRequest & Request<{ replyId: string }>, res: Response) => {
         try {
-            const { id } = req.params;
-            const userId = req.user!.id; // 토큰에서 가져온 작성자 ID
+            const id = Number(req.params.replyId);
+            if (isNaN(id)) {
+                return res.status(400).json({ message: "유효하지 않은 댓글 ID 입니다." });
+            }
 
-            // userId를 인자로 추가 전달
-            await this.replyService.deleteReply(Number(id), userId);
-            res.json({ message: "댓글이 삭제되었습니다." });
+            if (!req.user) {
+                return res.status(401).json({ message: "로그인이 필요한 서비스입니다." });
+            }
+            const userId = req.user.id;
+
+            await replyService.deleteReply(id, userId);
+
+            return res.status(200).json({ message: "댓글이 성공적으로 삭제되었습니다." });
         } catch (error: any) {
-            // 본인 확인 실패 시 403(권한 없음) 에러 전달
-            res.status(403).json({ message: error.message });
+            if (error.message === "NOT_FOUND_REPLY") {
+                return res.status(404).json({ message: "존재하지 않는 댓글입니다." });
+            }
+            if (error.message === "FORBIDDEN") {
+                return res.status(403).json({ message: "댓글 삭제 권한이 없습니다." });
+            }
+            console.error(error);
+            return res.status(500).json({ message: "댓글 삭제 중 서버 오류가 발생되었습니다." });
         }
     };
 }
