@@ -8,6 +8,9 @@ import inquiryRouter from "./routes/inquiryRouter.ts";
 import walkLogRouter from "./routes/walkLogRouter.ts";
 import communityPostRouter from "./routes/admin/post/communityPostRouter.ts";
 import petRouter from "./routes/petRouter.ts";
+import vetRecordRourter from "./routes/vetRecordRourter.ts";
+import weightLogRouter from "./routes/weightLogRouter.ts";
+import waterLogRouter from "./routes/waterLogRouter.ts";
 
 dotenv.config();
 
@@ -30,6 +33,10 @@ app.use("/post", communityPostRouter);
 
 app.use("/pet", petRouter);
 
+app.use("/walk-logs",walkLogRouter);
+app.use("/vet-records", vetRecordRourter);
+app.use("/weight-logs",weightLogRouter);
+app.use("/water-logs",waterLogRouter);
 app.listen(PORT, () => {
     console.log(`서버 실행됨! http://localhost:${PORT}`);
 });
