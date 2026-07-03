@@ -155,7 +155,7 @@ model VetRecord {
   visitPurpose String
   diagnosis    String?
   treatment    String?
-  cost         Int?
+  cost         Int      @default(0)
   receiptImage String?
   memo         String?
   petId        Int
