@@ -7,7 +7,7 @@ import { petCreateSchema } from "../schemas/user/pet/petCreateSchema.ts";
 const router = Router();
 
 router.post("/create", authenticate, validate(petCreateSchema), petController.createPets);
-router.patch("/update/:id", authenticate, validate(petCreateSchema), petController.updatePets);
-router.delete("/delete/:id", authenticate, petController.deletePets);
+router.patch("/update/:petId", authenticate, validate(petCreateSchema), petController.updatePets);
+router.delete("/delete/:petId", authenticate, petController.deletePets);
 
 export default router;
