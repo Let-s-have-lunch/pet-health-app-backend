@@ -67,6 +67,7 @@ export const requiredAdmin = async (req: AuthRequest, res: Response, next: NextF
     }
     if (req.user.role !== RoleType.ADMIN) {
         res.status(403).json({ message: "해당 기능에 접근 할 수 있는 관리자 권한이 없습니다." });
+        return;
     }
     next();
 };

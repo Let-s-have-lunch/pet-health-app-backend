@@ -1,6 +1,4 @@
-import { PetCreateInputType } from "../schemas/user/pet/petCreateSchema.ts";
 import prisma from "../config/prisma.ts";
-import { PrismaClientKnownRequestError } from "@prisma/client/runtime/client";
 import { Prisma } from "../generated/prisma/client.ts";
 import { PetCreateInput, PetUpdateInput } from "../generated/prisma/models/Pet.ts";
 
@@ -23,8 +21,30 @@ const createPet = async (data: PetCreateInput) => {
     }
 };
 
-const updatePet = async (data: PetUpdateInput) => {}
+const updatePet = async ( userId: number, petId: number, input: PetUpdateInput) => {
+    const existPet = await prisma.pet.findFirst({
+        where: {
+            id: petId,
+            userId: userId,
+            deletedAt: null,
+        },
+    });
+
+    if (existPet) {
+        throw new Error("DUPLICATED_PET")
+    }
+
+    return prisma.pet.update({
+        where: {
+            id: petId,
+        },
+       data: {
+            ...input,
+        }
+    });
+}
 
 export default {
     createPet,
+    updatePet,
 };

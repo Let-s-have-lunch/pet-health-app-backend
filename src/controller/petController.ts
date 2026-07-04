@@ -1,8 +1,6 @@
 import { Request, Response } from "express";
 import userService from "../service/userService.ts";
-import petService from "../service/petService.ts";
-import { PetCreateInputType } from "../schemas/user/pet/petCreateSchema.ts";
-import { PetCreateInput } from "../generated/prisma/models/Pet.ts";
+import petService from "../service/petService.ts";import { PetCreateInput, PetUpdateInput } from "../generated/prisma/models/Pet.ts";
 import { AuthRequest } from "../middlewares/auth.ts";
 import { PetUpdateInputType } from "../schemas/user/pet/petUpdateSchema.ts";
 
@@ -56,27 +54,38 @@ const createPets = async (req: AuthRequest, res: Response) => {
     }
 };
 
-const updatePets = async (req: AuthRequest, res: Response) => {
+const updatePets = async (req: AuthRequest<{petId: string}>, res: Response) => {
     try {
         if (!req.user) {
             res.status(401).json({ message: "인증되지 않은 사용자입니다. "});
             return;
         }
-        const userId = req.user.id;
-        const input: PetUpdateInputType = req.body;
-        const result = await userService.updatePet( userId, input );
+
+        const petId = Number(req.params.petId);
+        if (isNaN(petId)) {
+            res.status(400).json({ message: "유효하지 않은 반려동물 ID 입니다." })
+            return;
+        }
+
+        const userId = req.user?.id;
+        const input: PetUpdateInput = req.body;
+
+        const result = await petService.updatePet( userId, petId, input );
+
         res.status(200).json({
-            message: "반려동물 정보가 성공적으로 수정되었습니다."
+            message: "반려동물 정보가 성공적으로 수정되었습니다.",
         })
+
     } catch(error) {
+        console.log(error);
+        res.status(500).json({ message: "서버 에러가 발생했습니다." });
 
     }
 };
 
-const deletePets = async (req: Request, res: Response) => {};
+
 
 export default {
     createPets,
     updatePets,
-    deletePets,
 };
