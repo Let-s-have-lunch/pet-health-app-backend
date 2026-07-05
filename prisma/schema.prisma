@@ -91,7 +91,6 @@ model Todo {
   date        DateTime
   isCompleted Boolean   @default(false)
   createdAt   DateTime  @default(now())
-  birthdate   DateTime?
   role        RoleType  @default(USER)
 
   userId Int
