@@ -12,6 +12,7 @@ import vetRecordRourter from "./routes/vetRecordRourter.ts";
 import weightLogRouter from "./routes/weightLogRouter.ts";
 import waterLogRouter from "./routes/waterLogRouter.ts";
 import diaryRouter from "./routes/diaryRouter.ts";
+import todoRouter from "./routes/todoRouter.ts";
 
 dotenv.config();
 
@@ -34,6 +35,7 @@ app.use("/post", communityPostRouter);
 
 app.use("/pet", petRouter);
 app.use("/diary", diaryRouter);
+app.use("/todo", todoRouter);
 
 app.use("/walk-logs",walkLogRouter);
 app.use("/vet-records", vetRecordRourter);
