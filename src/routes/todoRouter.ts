@@ -6,9 +6,9 @@ import todoController from "../controller/todoController.ts";
 
 const router = Router();
 
-router.post("/", authenticate, validate(createTodoSchema),todoController.createTodo);
-router.get("/:id"),authenticate,todoController.getTodoById);
-router.patch("/:id"),authenticate,validate(createTodoSchema),todoController.updateTodo);
-router.delete("/:id"),authenticate,todoController.deleteTodo);
+router.post("/", authenticate, validate(createTodoSchema), todoController.createTodo);
+router.get("/:id", authenticate, todoController.getTodoById);
+router.patch("/:id", authenticate, validate(createTodoSchema), todoController.updateTodo);
+router.delete("/:id", authenticate, todoController.deleteTodo);
 
 export default router;

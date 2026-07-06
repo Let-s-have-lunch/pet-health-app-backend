@@ -1,5 +1,5 @@
-const todoService = async() => {}
+const createTodo = async () => {};
 
 export default {
-    todoService,
-}
+    createTodo,
+};
