@@ -8,11 +8,12 @@ import inquiryRouter from "./routes/inquiryRouter.ts";
 import walkLogRouter from "./routes/walkLogRouter.ts";
 import communityPostRouter from "./routes/admin/post/communityPostRouter.ts";
 import petRouter from "./routes/petRouter.ts";
-import vetRecordRourter from "./routes/vetRecordRourter.ts";
 import weightLogRouter from "./routes/weightLogRouter.ts";
 import waterLogRouter from "./routes/waterLogRouter.ts";
 import diaryRouter from "./routes/diaryRouter.ts";
 import todoRouter from "./routes/todoRouter.ts";
+import vetRecordRouter from "./routes/vetRecordRourter.ts";
+import vetRecordRourter from "./routes/vetRecordRourter.ts";
 
 dotenv.config();
 
@@ -37,7 +38,6 @@ app.use("/pet", petRouter);
 app.use("/diary", diaryRouter);
 app.use("/todo", todoRouter);
 
-app.use("/walk-logs",walkLogRouter);
 app.use("/vet-records", vetRecordRourter);
 app.use("/weight-logs",weightLogRouter);
 app.use("/water-logs",waterLogRouter);
