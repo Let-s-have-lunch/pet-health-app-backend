@@ -224,3 +224,16 @@ model Reply {
   // 💡 외래키 설정: 이 댓글이 어느 게시글에 속하는지 명시
   post Post @relation(fields: [postId], references: [id])
 }
+
+model Faq {
+  id Int @id @default(autoincrement())
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  category String // 예: "사료", "미용", "건강", "기타"
+  question String
+  answer   String @db.Text // 답변은 길어질 수 있으므로 Text 타입 추천
+  order    Int    @default(0) // FAQ 노출 순서
+}
