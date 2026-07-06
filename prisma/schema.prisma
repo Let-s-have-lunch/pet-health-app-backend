@@ -70,7 +70,8 @@ model Pet {
 }
 
 model Diary {
-  id         Int     @id @default(autoincrement())
+  id         Int      @id @default(autoincrement())
+  date       DateTime
   title      String
   content    String
   diaryImage String?
@@ -87,6 +88,7 @@ model Diary {
 
 model Todo {
   id          Int       @id @default(autoincrement())
+  date        DateTime
   title       String
   isCompleted Boolean   @default(false)
   createdAt   DateTime  @default(now())
