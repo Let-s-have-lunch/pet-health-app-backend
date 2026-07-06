@@ -9,7 +9,6 @@ const router = express.Router();
  */
 const validateId = (req, res, next) => {
     const { id } = req.params;
-
     // ID가 존재하고, 숫자가 아닐 경우 즉시 400 에러 반환
     if (id && isNaN(Number(id))) {
         return res.status(400).json({

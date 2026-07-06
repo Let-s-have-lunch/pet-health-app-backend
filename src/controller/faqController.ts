@@ -1,45 +1,47 @@
+import { Request, Response } from "express";
 import faqService from "../service/faqService.ts";
 
-const faqController = {
-    /**
-     * @param {import('express').Request} req
-     * @param {import('express').Response} res
-     */
-    getFaqs: async (req, res) => {
-        try {
-            const { category } = req.query;
-            const faqs = await faqService.findAllFaqs(
-                typeof category === "string" ? category : undefined
-            );
+const getFaqs = async (req:Request, res:Response): Promise<void> => {
+    try {
+        const { category } = req.query;
+        const faqs = await faqService.findAllFaqs(
+            typeof category === "string" ? category : undefined
+        );
 
-            return res.status(200).json({ success: true, data: faqs });
-        } catch (error) {
-            console.error("[FaqController.getFaqs Error]:", error.message);
-            return res.status(500).json({
-                success: false,
-                message: "서버 내부 오류가 발생했습니다."
-            });
-        }
-    },
-
-    /**
-     * @param {import('express').Request} req
-     * @param {import('express').Response} res
-     */
-    getFaqDetail: async (req, res) => {
-        try {
-            const { id } = req.params;
-            const faq = await faqService.findFaqById(id);
-
-            return res.status(200).json({ success: true, data: faq });
-        } catch (error) {
-            const statusCode = error.status || 500;
-            return res.status(statusCode).json({
-                success: false,
-                message: error.message,
-            });
-        }
-    },
+        res.status(200).json({
+            success: true,
+            data: faqs,
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({
+            success: false,
+            message: "FAQ 목록 조회 중 서버 에러가 발생했습니다.",
+        });
+    }
 };
 
-export default faqController;
+const getFaqDetail = async (req:Request, res:Response):Promise<void> => {
+    try {
+        const { id } = req.params;
+        const result = await faqService.getFaqById(id);
+
+        res.status(200).json({
+            success: true,
+            data: result,
+        });
+    } catch (error:any) {
+        console.error(error);
+        const statusCode = error.status || 500;
+        res.status(statusCode).json({
+            success: false,
+            message: error.message || "상세 조회 중 서버 에러가 발생했습니다.",
+        });
+    }
+};
+
+// 강사님 스타일대로 내보내기
+export default {
+    getFaqs,
+    getFaqDetail,
+};
