@@ -1,0 +1,49 @@
+import { Request, Response } from "express";
+import homeService from "../service/homeService.ts";
+
+/**
+  [GET] 메인 홈 화면 대시보드 데이터 조회
+ * Query: petId, date
+ */
+export const getHomeDashboard = async (req: Request, res: Response) => {
+    try {
+        const petId = parseInt(String(req.query.petId), 10);
+        const dateStr = String(req.query.date); // 예: "2026-07-01"
+
+        if (!petId || !dateStr || dateStr === "undefined") {
+            return res.status(400).json({
+                success: false,
+                message: "petId와 date 쿼리 파라미터가 필요합니다.",
+            });
+        }
+
+        // 💡 homeService에서 Promise.all 함수를 호출합니다!
+        // const dashboardData = await homeService.getPetDashboardWithPromiseAll(petId, dateStr);
+        const dashboardData = {
+            date: dateStr,
+            walk: { count: 8 },
+            weight: { value: 6.2 },
+            water: { totalAmount: 400 },
+            vetRecord: {
+                purpose: "정기 예방접종",
+                hospitalName: "튼튼동물병원",
+            },
+        };
+
+        return res.status(200).json({
+            success: true,
+            message: "홈 대시보드 데이터 조회 성공",
+            data: dashboardData,
+        });
+    } catch (error: any) {
+        console.error("getHomeDashboard 에러:", error);
+        return res.status(500).json({
+            success: false,
+            message: "서버 오류가 발생했습니다.",
+        });
+    }
+};
+
+export default {
+    getHomeDashboard,
+};

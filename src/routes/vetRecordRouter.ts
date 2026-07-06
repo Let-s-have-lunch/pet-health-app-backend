@@ -1,0 +1,51 @@
+import { Router } from "express";
+import vetRecordController from "../controller/vetRecordController.ts";
+import { authenticate } from "../middlewares/auth.ts";
+import { validate } from "../middlewares/validate.ts";
+// 💡 팀 규칙에 맞춰 쪼개놓은 스키마들을 전부 가져옵니다!
+import {
+    getVetRecordSchema,
+    deleteVetRecordSchema,
+    UpdateVetRecordSchema,
+    CreateVetRecordSchema,
+} from "../schemas/user/vetRecordSchema.ts";
+
+const router = Router();
+
+// 1. 병원 기록 생성
+router.post(
+    "/",
+    authenticate,
+    validate(CreateVetRecordSchema), // 👈 생성 검증 스키마 적용[cite: 1]
+    vetRecordController.createVetRecord,
+);
+
+// 2. 특정 반려동물의 전체 병원 기록 조회
+// (URL 파라미터 :petId에 대한 별도 스키마가 없다면 인증 미들웨어만 유지합니다)
+router.get("/pet/:petId", authenticate, vetRecordController.getVetRecordsByPetId);
+
+// 3. 특정 병원 기록 상세 조회
+router.get(
+    "/:id",
+    authenticate,
+    validate(getVetRecordSchema), // 👈 ID 검증 스키마 적용[cite: 3]
+    vetRecordController.getVetRecordById,
+);
+
+// 4. 병원 기록 수정
+router.put(
+    "/:id",
+    authenticate,
+    validate(UpdateVetRecordSchema), // 👈 수정 검증 스키마 적용[cite: 4]
+    vetRecordController.updateVetRecord,
+);
+
+// 5. 병원 기록 삭제
+router.delete(
+    "/:id",
+    authenticate,
+    validate(deleteVetRecordSchema), // 👈 삭제 검증 스키마 적용[cite: 2]
+    vetRecordController.deleteVetRecord,
+);
+
+export default router;

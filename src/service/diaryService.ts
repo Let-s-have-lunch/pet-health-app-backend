@@ -1,0 +1,86 @@
+import { CreateDiaryInputType } from "../schemas/user/diary/createDiarySchema.ts";
+import prisma from "../config/prisma.ts";
+
+const createDiary = async (diaryData: CreateDiaryInputType, userId: number) => {
+    return prisma.diary.create({
+        data: {
+            ...diaryData,
+            diaryImage: diaryData.diaryImage ?? null,
+            user: {
+                connect: {
+                    id: userId,
+                },
+            },
+        },
+    });
+};
+
+const getDiaryById = async (diaryId: number, userId: number) => {
+    const diary = await prisma.diary.findFirst({
+        where: {
+            id: diaryId,
+            userId: userId,
+            deletedAt: null,
+        },
+    });
+
+    if (!diary) {
+        return null;
+    }
+
+    return {
+        ...diary,
+    };
+};
+
+const updateDiary = async (diaryId: number, userId: number, diaryData: CreateDiaryInputType) => {
+    const diary = await prisma.diary.findFirst({
+        where: {
+            id: diaryId,
+            userId,
+            deletedAt: null,
+        },
+    });
+
+    if (!diary) {
+        return null;
+    }
+
+    return prisma.diary.update({
+        where: {
+            id: diaryId,
+        },
+        data: {
+            ...diaryData,
+            diaryImage: diaryData.diaryImage ?? null,
+        },
+    });
+};
+
+const deleteDiary = async (diaryId: number, userId: number) => {
+    const diary = await prisma.diary.findFirst({
+        where: {
+            id: diaryId,
+            userId,
+            deletedAt: null,
+        },
+    });
+    if (!diary) {
+        return null;
+    }
+    return prisma.diary.update({
+        where: {
+            id: diaryId,
+        },
+        data: {
+            deletedAt: new Date(),
+        },
+    });
+};
+
+export default {
+    createDiary,
+    getDiaryById,
+    updateDiary,
+    deleteDiary,
+};
