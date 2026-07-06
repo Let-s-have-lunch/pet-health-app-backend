@@ -84,14 +84,14 @@ const getWaterLogStats = async (
     petId: number,
     query: { period: "daily" | "weekly" | "monthly"; baseDate: string },
 ) => {
-    // 1. 소유권 검증
     await checkPetOwnership(userId, petId);
 
     const { period, baseDate } = query;
     const targetDate = new Date(baseDate);
     let startDate = new Date(targetDate);
+    let endDate = new Date(targetDate); // 👈 월말 조회를 위한 종료일 변수 추가
 
-    // 2. 통계 기간 분기 처리
+    // 1. 기간 분기 및 정밀한 날짜 범위 세팅
     if (period === "daily") {
         startDate.setDate(targetDate.getDate() - 6);
     } else if (period === "weekly") {
@@ -99,22 +99,25 @@ const getWaterLogStats = async (
     } else if (period === "monthly") {
         startDate.setMonth(targetDate.getMonth() - 5);
         startDate.setDate(1);
+        startDate.setHours(0, 0, 0, 0);
+
+        // targetDate가 속한 달의 마지막 날짜의 밤 11시 59분으로 설정
+        endDate = new Date(targetDate.getFullYear(), targetDate.getMonth() + 1, 0, 23, 59, 59);
     }
 
-    // 3. 프리즈마 범위 조회
+    // 2. 프리즈마 범위 조회 (endDate 적용)
     const logs = await prisma.waterLog.findMany({
         where: {
             petId,
             deletedAt: null,
             recordDate: {
                 gte: startDate,
-                lte: targetDate,
+                lte: endDate,
             },
         },
         orderBy: { recordDate: "asc" },
     });
 
-    // 4. 프론트엔드 그래프 친화적 데이터 가공
     const statsMap: { [key: string]: number } = {};
 
     logs.forEach(log => {
@@ -122,11 +125,13 @@ const getWaterLogStats = async (
         const dateObj = new Date(log.recordDate);
 
         if (period === "daily") {
-            //  뒤에 ?? "" 를 붙여서 undefined가 절대 안 나오게 방어합니다!
             key = dateObj.toISOString().split("T")[0] ?? "";
         } else if (period === "weekly") {
-            //  여기도 똑같이 ?? "" 안전장치 추가!
-            key = dateObj.toISOString().split("T")[0] ?? "";
+            // 💡 [해결] 해당 날짜가 속한 주의 월요일 날짜를 찾아서 그룹화 키로 사용합니다.
+            const day = dateObj.getDay(); // 0(일) ~ 6(토)
+            const diff = dateObj.getDate() - day + (day === 0 ? -6 : 1); // 월요일로 맞춤
+            const monday = new Date(dateObj.setDate(diff));
+            key = monday.toISOString().split("T")[0] ?? "";
         } else if (period === "monthly") {
             key = `${dateObj.getFullYear()}-${String(dateObj.getMonth() + 1).padStart(2, "0")}`;
         }
@@ -134,7 +139,6 @@ const getWaterLogStats = async (
         statsMap[key] = (statsMap[key] || 0) + log.amount;
     });
 
-    // 5. 객체를 배열 구조로 변환
     const chartData = Object.keys(statsMap).map(key => ({
         date: key,
         totalAmount: statsMap[key],
