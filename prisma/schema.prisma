@@ -33,10 +33,14 @@ model User {
   password String
   email    String @unique
 
-  birthdate DateTime
-  role      RoleType  @default(USER)
-  pets      Pet[]
-  inquiries Inquiry[]
+  birthdate      DateTime?
+  role           RoleType        @default(USER)
+  pets           Pet[]
+  inquiries      Inquiry[]
+  communityPosts CommunityPost[]
+  replies        Reply[]
+  diaries        Diary[]
+  todos          Todo[]
 }
 
 model Pet {
@@ -54,8 +58,6 @@ model Pet {
   updatedAt DateTime  @updatedAt
   deletedAt DateTime?
 
-  diaries    Diary[]
-  todos      Todo[]
   walkLogs   WalkLog[]
   vetRecords VetRecord[]
   weightLogs WeightLog[]
@@ -68,35 +70,33 @@ model Pet {
 }
 
 model Diary {
-  id         Int      @id @default(autoincrement())
+  id         Int     @id @default(autoincrement())
   title      String
   content    String
   diaryImage String?
-  date       DateTime
 
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
   deletedAt DateTime?
 
-  petId Int
-  pet   Pet @relation(fields: [petId], references: [id])
+  userId Int
+  user   User @relation(fields: [userId], references: [id])
 
-  @@index([petId])
+  @@index([userId])
 }
 
 model Todo {
-  id          Int      @id @default(autoincrement())
+  id          Int       @id @default(autoincrement())
   title       String
-  date        DateTime
-  isCompleted Boolean  @default(false)
-  createdAt   DateTime @default(now())
+  isCompleted Boolean   @default(false)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  deletedAt   DateTime?
 
-  petId     Int
-  pet       Pet       @relation(fields: [petId], references: [id])
-  birthdate DateTime?
-  role      RoleType  @default(USER)
+  userId Int
+  user   User @relation(fields: [userId], references: [id])
 
-  @@index([petId])
+  @@index([userId])
 }
 
 model Notice {
@@ -200,4 +200,35 @@ model WaterLog {
 
   @@index([petId])
   @@index([recordDate])
+}
+
+model CommunityPost {
+  id        Int       @id @default(autoincrement())
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+  title     String
+  content   String    @db.Text
+  views     Int       @default(0)
+  userId    Int
+  user      User      @relation(fields: [userId], references: [id])
+
+  replies Reply[]
+
+  @@index([userId])
+}
+
+model Reply {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  content   String   @db.Text
+
+  userId          Int
+  user            User          @relation(fields: [userId], references: [id])
+  communityPostId Int
+  communityPost   CommunityPost @relation(fields: [communityPostId], references: [id])
+
+  @@index([userId])
+  @@index([communityPostId])
 }

@@ -26,8 +26,12 @@ app.use("/user", userRouter);
 app.use("/notice", noticeRouter);
 app.use("/inquiry", inquiryRouter);
 app.use("/admin", adminRouter);
+app.use("/walk-logs",walkLogRouter)
 app.use("/post", communityPostRouter);
+
 app.use("/pet", petRouter);
+app.use("/diary", diaryRouter);
+app.use("/todo", todoRouter);
 
 // 로그 및 건강 기록 담당 라우터
 app.use("/walk-logs",walkLogRouter);
