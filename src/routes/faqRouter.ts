@@ -1,4 +1,4 @@
-import express from 'express';
+import express, { Request, Response, NextFunction } from 'express';
 import faqController from "../controller/faqController.ts"
 
 const router = express.Router();
@@ -7,7 +7,7 @@ const router = express.Router();
  * [Middleware] 요청 파라미터 검증
  * 컨트롤러에 도달하기 전 ID 형식을 사전 검증하여 서버 안정성을 높입니다.
  */
-const validateId = (req, res, next) => {
+const validateId = (req: Request, res: Response, next: NextFunction) => {
     const { id } = req.params;
     // ID가 존재하고, 숫자가 아닐 경우 즉시 400 에러 반환
     if (id && isNaN(Number(id))) {

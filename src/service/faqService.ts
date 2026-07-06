@@ -1,19 +1,19 @@
 import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
 
-const getFaqById = async (id) => {
+const getFaqById = async (id: string | number) => {
     const faq = await prisma.faq.findUnique({
         where: { id: Number(id) },
     });
     if (!faq) {
-        const error = new Error("FAQ를 찾을 수 없습니다.");
+        const error = new Error("FAQ를 찾을 수 없습니다.") as any;
         error.status = 404; // 나중에 컨트롤러에서 바로 쓰기 위함
         throw error;
     }
     return faq;
 };
 
-const findAllFaqs = async (category) => {
+const findAllFaqs = async (category?: string) => {
     return await prisma.faq.findMany({
         where: {
             ...(category && { category }), // category가 있으면 필터링
@@ -22,13 +22,13 @@ const findAllFaqs = async (category) => {
     });
 };
 
-const createFaq = async (question, answer, category) => {
+const createFaq = async (question: string, answer: string, category: string) => {
     return await prisma.faq.create({
         data: { question, answer, category },
     });
 };
 
-const updateFaq = async (id, question, answer, category) => {
+const updateFaq = async (id: string | number, question: string, answer: string, category:string) => {
     await getFaqById(id); // 먼저 있는지 확인
     return await prisma.faq.update({
         where: { id: Number(id) },
@@ -36,7 +36,7 @@ const updateFaq = async (id, question, answer, category) => {
     });
 };
 
-const deleteFaq = async (id) => {
+const deleteFaq = async (id: string | number) => {
     await getFaqById(id); // 먼저 있는지 확인
     return await prisma.faq.delete({
         where: { id: Number(id) },
