@@ -9,7 +9,12 @@ import walkLogRouter from "./routes/walkLogRouter.ts";
 import weightLogRouter from "./routes/weightLogRouter.ts";
 import waterLogRouter from "./routes/waterLogRouter.ts";
 import vetRecordRouter from "./routes/vetRecordRouter.ts";
-
+import communityPostRouter from "./routes/communityPostRouter.ts";
+import petRouter from "./routes/petRouter.ts";
+import diaryRouter from "./routes/diaryRouter.ts";
+import todoRouter from "./routes/todoRouter.ts";
+import homeRouter from "./routes/homeRouter.ts";
+import cors from "cors";
 dotenv.config();
 
 const app = express();
@@ -19,15 +24,16 @@ const PORT = process.env.PORT || "8080";
 
 
 app.use(express.json());
-
 app.use(express.urlencoded({ extended: true }));
+app.use(cors({ origin: ["http://localhost:8081"], credentials: true }));
 
+app.use("/home", homeRouter);
 app.use("/user", userRouter);
 app.use("/notice", noticeRouter);
 app.use("/inquiry", inquiryRouter);
 app.use("/admin", adminRouter);
-app.use("/walk-logs",walkLogRouter)
 app.use("/post", communityPostRouter);
+
 
 app.use("/pet", petRouter);
 app.use("/diary", diaryRouter);
