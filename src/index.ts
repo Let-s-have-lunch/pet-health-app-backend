@@ -6,8 +6,10 @@ import noticeRouter from "./routes/noticeRouter.ts";
 import adminRouter from "./routes/admin/adminRouter.ts";
 import inquiryRouter from "./routes/inquiryRouter.ts";
 import walkLogRouter from "./routes/walkLogRouter.ts";
-import communityPostRouter from "./routes/admin/post/communityPostRouter.ts";
 import petRouter from "./routes/petRouter.ts";
+import communityPostRouter from "./routes/communityPostRouter.ts";
+import cors from "cors";
+
 
 dotenv.config();
 
@@ -15,6 +17,7 @@ const app = express();
 
 const PORT = process.env.PORT || "8080";
 
+app.use(cors({ origin:  "http://localhost:8081", credentials: true }));
 
 
 app.use(express.json());
