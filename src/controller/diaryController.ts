@@ -13,12 +13,13 @@ const createDiary = async (req: AuthRequest, res: Response) => {
             return res.status(401).json({ message: "로그인이 필요한 서비스입니다." });
         }
 
-        const { title, content, diaryImage }: CreateDiaryInputType = req.body;
+        const { title, content, diaryImage, date }: CreateDiaryInputType = req.body;
 
         const diaryData: CreateDiaryInputType = {
             title,
             content,
             diaryImage,
+            date,
         };
 
         const newDiary = await diaryService.createDiary(diaryData, user.id);
@@ -84,12 +85,13 @@ const updateDiary = async (req: AuthRequest<{ id: string }>, res: Response) => {
 
         const userId = user.id;
 
-        const { title, content, diaryImage }: CreateDiaryInputType = req.body;
+        const { title, content, diaryImage, date }: CreateDiaryInputType = req.body;
 
         const diaryData = {
             title,
             content,
             diaryImage,
+            date,
         };
 
         const updatedDiary = await diaryService.updateDiary(diaryId, userId, diaryData);
