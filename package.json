@@ -5,7 +5,7 @@
     "main": "index.js",
     "type": "commonjs",
     "scripts": {
-        "dev": "tsx watch src/index.ts",
+        "dev": "tsx watch --env-file=.env src/index.ts",
         "prisma:migrate": "prisma migrate dev",
         "prisma:generate": "prisma generate",
         "seed:post": "tsx seed/post.ts",
