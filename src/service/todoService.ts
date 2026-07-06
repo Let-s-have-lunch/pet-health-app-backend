@@ -49,7 +49,7 @@ const updateTodo = async (userId: number, todoId: number, input: CreateTodoInput
     });
 };
 
-const deleteTodo = async ( id: number, userId: number ) => {
+const deleteTodo = async (id: number, userId: number) => {
     const todo = await prisma.todo.findUnique({
         where: {
             id,
