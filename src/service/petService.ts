@@ -12,17 +12,6 @@ const getMyPets = async (userId: number) => {
         orderBy: {
             createdAt: "desc",
         },
-        select: {
-            id: true,
-            name: true,
-            species: true,
-            breed: true,
-            profileImage: true,
-            birthdate: true,
-            gender: true,
-            neutered: true,
-            registrationNumber: true,
-        },
     });
 };
 
