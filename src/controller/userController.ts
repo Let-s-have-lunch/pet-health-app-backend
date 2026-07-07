@@ -97,14 +97,10 @@ const updateUser = async (req: AuthRequest, res: Response) => {
         if (error instanceof Error) {
             if (error.message === "USER_NOT_FOUND") {
                 res.status(404).json({ message: "해당 사용자를 찾을 수 없습니다." });
+                return;
             } else if (error.message === "DUPLICATED_NICKNAME") {
                 res.status(409).json({
                     message: "이미 존재하는 닉네임입니다.",
-                });
-                return;
-            } else if (error.message === "DUPLICATED_EMAIL") {
-                res.status(409).json({
-                    message: "이미 존재하는 이메일입니다.",
                 });
                 return;
             }

@@ -79,30 +79,20 @@ const updateUser = async (userId: number, input: UpdateUserInputType) => {
         throw new Error("USER_NOT_FOUND");
     }
 
-    const existNickname = await prisma.user.findFirst({
-        where: {
-            nickname: input.nickname,
-            deletedAt: null,
-            id: {
-                not: userId,
+    if (input.nickname) {
+        const existNickname = await prisma.user.findFirst({
+            where: {
+                nickname: input.nickname,
+                deletedAt: null,
+                id: {
+                    not: userId,
+                },
             },
-        },
-    });
-    if (existNickname) {
-        throw new Error("DUPLICATED_NICKNAME");
-    }
+        });
 
-    const existEmail = await prisma.user.findFirst({
-        where: {
-            email: input.email,
-            deletedAt: null,
-            id: {
-                not: userId,
-            },
-        },
-    });
-    if (existEmail) {
-        throw new Error("DUPLICATED_EMAIL");
+        if (existNickname) {
+            throw new Error("DUPLICATED_NICKNAME");
+        }
     }
 
     return prisma.user.update({
@@ -111,7 +101,6 @@ const updateUser = async (userId: number, input: UpdateUserInputType) => {
         },
         data: {
             nickname: input.nickname,
-            email: input.email,
             birthdate: input.birthdate ?? null,
         },
     });
