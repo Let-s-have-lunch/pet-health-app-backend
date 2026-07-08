@@ -5,6 +5,7 @@ import adminUserRouter from "./user/adminUserRouter.ts";
 import { validate } from "../../middlewares/validate.ts";
 import { getAdminStatsSchema } from "../../schemas/admin/adminStatSchema.ts";
 import adminStatController from "../../controller/admin/adminStatController.ts";
+import adminInquiryRouter from "./inquiry/adminInquiryRouter.ts";
 
 const router = Router();
 
@@ -13,6 +14,8 @@ router.use(requiredAdmin);
 
 router.use("/notice", adminNoticeRouter);
 router.use("/user", adminUserRouter);
+router.use("/inquiry", adminInquiryRouter);
+
 
 // 1. 병원 방문 목적별 통계
 router.get(
@@ -34,4 +37,5 @@ router.get(
     validate(getAdminStatsSchema), // 연도 검증 스키마 똑같이 사용
     adminStatController.getWalkDurationAverage // 컨트롤러에 새로 만들 함수명
 );
+
 export default router;

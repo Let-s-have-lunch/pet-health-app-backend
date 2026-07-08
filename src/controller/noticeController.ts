@@ -23,7 +23,7 @@ const getNoticeById = async (req: Request<{ noticeId: string }>, res: Response) 
             return res.status(400).json({ message: "유효하지 않은 공지사항 ID 입니다." });
 
         const result = await noticeService.getNoticeById(id);
-        res.status(200).json({ message: "공지사항 목록 조회 성공", data: result });
+        res.status(200).json({ message: "공지사항 조회 성공", data: result });
     } catch (error) {
         console.log(error);
         res.status(500).json({
