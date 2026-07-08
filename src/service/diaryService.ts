@@ -15,22 +15,26 @@ const createDiary = async (diaryData: CreateDiaryInputType, userId: number) => {
     });
 };
 
-const getDiaryById = async (diaryId: number, userId: number) => {
-    const diary = await prisma.diary.findFirst({
+const getDiaryList = async (userId: number, date: Date) => {
+
+    const startOfDay = new Date(date);
+    startOfDay.setHours(0, 0, 0, 0);
+
+    const nextDay = new Date(startOfDay);
+    nextDay.setDate(nextDay.getDate() + 1);
+
+    const diary = await prisma.diary.findMany({
         where: {
-            id: diaryId,
-            userId: userId,
+            userId,
             deletedAt: null,
+            date: {
+                gte: startOfDay,
+                lt: nextDay,
+            },
         },
     });
 
-    if (!diary) {
-        return null;
-    }
-
-    return {
-        ...diary,
-    };
+    return diary;
 };
 
 const updateDiary = async (diaryId: number, userId: number, diaryData: CreateDiaryInputType) => {
@@ -80,7 +84,7 @@ const deleteDiary = async (diaryId: number, userId: number) => {
 
 export default {
     createDiary,
-    getDiaryById,
+    getDiaryList,
     updateDiary,
     deleteDiary,
 };
