@@ -1,20 +1,41 @@
-import { Request, Response } from "express";
+import { Response } from "express";
 import { AuthRequest } from "../middlewares/auth.ts";
 import todoService from "../service/todoService.ts";
 import { CreateTodoInputType } from "../schemas/user/todo/createTodoSchema.ts";
 
 const getTodoList = async (req: AuthRequest, res: Response) => {
     try {
-        if (!req.user) {
-            res.status(401).json({ message: "인증되지 않은 사용자입니다. " });
-            return;
+        const date = req.query.date;
+
+        if (!date) {
+            return res.status(400).json({
+                message: "날짜를 입력해주세요.",
+            });
         }
-        const date = req.query.date as string;
+
+        if (typeof date !== "string") {
+            return res.status(400).json({
+                message: "잘못된 날짜입니다.",
+            });
+        }
+        const parsedDate = new Date(date);
+
+        if (isNaN(parsedDate.getTime())) {
+            return res.status(400).json({
+                message: "유효하지 않은 날짜입니다.",
+            });
+        }
+
+        if (!req.user) {
+            return res.status(401).json({ message: "인증되지 않은 사용자입니다. " });
+        }
         const userId = req.user.id;
-        const todolist = await todoService.getTodoList(userId, date);
+
+        const todoList = await todoService.getTodoList(userId, parsedDate);
+
         res.status(200).json({
             message: "할 일 목록을 성공적으로 불러왔습니다.",
-            data: todolist,
+            data: todoList,
         });
     } catch (error) {
         console.log(error);
@@ -31,8 +52,7 @@ const createTodo = async (req: AuthRequest, res: Response) => {
             return res.status(401).json({ message: "로그인이 필요한 서비스입니다." });
         }
         const userId = user.id;
-        const { title, date }: CreateTodoInputType = req.body;
-        const todoData: CreateTodoInputType = { title, date };
+        const todoData: CreateTodoInputType = req.body;
         const newTodo = await todoService.createTodo(todoData, userId);
         res.status(201).json({
             message: "할 일이 등록되었습니다.",
@@ -49,8 +69,7 @@ const createTodo = async (req: AuthRequest, res: Response) => {
 const updateTodo = async (req: AuthRequest<{ id: string }>, res: Response) => {
     try {
         if (!req.user) {
-            res.status(401).json({ message: "인증되지 않은 사용자입니다. " });
-            return;
+            return res.status(401).json({ message: "인증되지 않은 사용자입니다. " });
         }
 
         const todoId = Number(req.params.id);
@@ -59,7 +78,7 @@ const updateTodo = async (req: AuthRequest<{ id: string }>, res: Response) => {
             return;
         }
 
-        const userId = req.user?.id;
+        const userId = req.user.id;
         const input: CreateTodoInputType = req.body;
         const result = await todoService.updateTodo(userId, todoId, input);
 
@@ -71,6 +90,7 @@ const updateTodo = async (req: AuthRequest<{ id: string }>, res: Response) => {
 
         res.status(200).json({
             message: "할 일이 성공적으로 수정되었습니다.",
+            data: result,
         });
     } catch (error) {
         console.log(error);
@@ -82,10 +102,9 @@ const deleteTodo = async (req: AuthRequest<{ id: string }>, res: Response) => {
     try {
         const id = Number(req.params.id);
         if (isNaN(id)) {
-            res.status(400).json({
+            return res.status(400).json({
                 message: "유효하지 않은 ID입니다.",
             });
-            return;
         }
 
         if (!req.user) {
@@ -102,6 +121,11 @@ const deleteTodo = async (req: AuthRequest<{ id: string }>, res: Response) => {
         });
     } catch (error) {
         console.log(error);
+        if (error instanceof Error && error.message === "NOT_FOUND_TODO") {
+            return res.status(404).json({
+                message: "할 일을 찾을 수 없습니다.",
+            });
+        }
         res.status(500).json({
             message: "할 일 삭제 중 오류가 발생되었습니다.",
         });

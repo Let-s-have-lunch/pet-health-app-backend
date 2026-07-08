@@ -23,7 +23,7 @@ const getDiaryList = async (userId: number, date: Date) => {
     const nextDay = new Date(startOfDay);
     nextDay.setDate(nextDay.getDate() + 1);
 
-    const diary = await prisma.diary.findMany({
+    return prisma.diary.findMany({
         where: {
             userId,
             deletedAt: null,
@@ -32,9 +32,11 @@ const getDiaryList = async (userId: number, date: Date) => {
                 lt: nextDay,
             },
         },
+        orderBy: {
+            id: "asc",
+        },
     });
 
-    return diary;
 };
 
 const updateDiary = async (diaryId: number, userId: number, diaryData: CreateDiaryInputType) => {

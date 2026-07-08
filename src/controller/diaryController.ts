@@ -5,15 +5,19 @@ import diaryService from "../service/diaryService.ts";
 
 const createDiary = async (req: AuthRequest, res: Response) => {
     try {
-        const user = req.user;
-        if (!user) {
+        if(!req.user) {
             return res.status(401).json({ message: "로그인이 필요한 서비스입니다." });
         }
 
+       const userId = req.user.id;
+
         const diaryData: CreateDiaryInputType = req.body;
 
-        const newDiary = await diaryService.createDiary(diaryData, user.id);
-        res.status(201).json(newDiary);
+        const newDiary = await diaryService.createDiary(diaryData, userId);
+        res.status(201).json({
+            message: "다이어리가 작성되었습니다.",
+            data: newDiary
+        });
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: "다이어리 작성 중 서버 에러가 발생되었습니다." });
@@ -43,14 +47,12 @@ const getDiaryList = async (req: AuthRequest, res: Response) => {
             });
         }
 
-        const user = req.user;
-        if (!user) {
-            return res.status(401).json({
-                message: "로그인이 필요한 서비스입니다.",
-            });
+        if (!req.user) {
+            return res.status(401).json({ message: "인증되지 않은 사용자입니다. " });
+
         }
 
-        const userId = user.id;
+        const userId = req.user.id;
 
         const diaryList = await diaryService.getDiaryList(userId, parsedDate);
 
@@ -70,8 +72,8 @@ const updateDiary = async (req: AuthRequest<{ diaryId: string }>, res: Response)
     try {
         const diaryId = Number(req.params.diaryId);
         if (isNaN(diaryId)) {
-            res.status(400).json({ message: "유효하지 않은 다이어리 ID 입니다. " });
-            return;
+           return res.status(400).json({ message: "유효하지 않은 다이어리 ID 입니다. " });
+
         }
 
         const user = req.user;
@@ -84,14 +86,7 @@ const updateDiary = async (req: AuthRequest<{ diaryId: string }>, res: Response)
 
         const userId = user.id;
 
-        const { title, content, diaryImage, date }: CreateDiaryInputType = req.body;
-
-        const diaryData = {
-            title,
-            content,
-            diaryImage,
-            date,
-        };
+        const diaryData: CreateDiaryInputType = req.body;
 
         const updatedDiary = await diaryService.updateDiary(diaryId, userId, diaryData);
         if (!updatedDiary) {
