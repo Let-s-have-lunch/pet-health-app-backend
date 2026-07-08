@@ -61,7 +61,7 @@ const createPet = async (req: AuthRequest, res: Response) => {
         const newPet = await petService.createPet(petData);
         res.status(201).json({ message: "새로운 반려동물이 등록되었습니다.", data: newPet });
     } catch (error) {
-        if (error instanceof Error && error.message === "ALREADY_EXISTS_REGISTRATIONNUMBER") {
+        if (error instanceof Error && error.message === "ALREADY_EXISTS_REGISTRATION_NUMBER") {
             return res.status(409).json({
                 message: "이미 사용중인 등록번호입니다.",
             });
