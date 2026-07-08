@@ -70,7 +70,7 @@ const deletePet = async (userId: number, petId: number) => {
         throw new Error("PET_NOT_FOUND");
     }
 
-    await prisma.pet.update({
+    return prisma.pet.update({
         where: {
             id: petId,
         },
