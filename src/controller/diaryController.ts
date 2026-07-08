@@ -23,6 +23,7 @@ const createDiary = async (req: AuthRequest, res: Response) => {
         };
 
         const newDiary = await diaryService.createDiary(diaryData, user.id);
+        res.status(201).json(newDiary);
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: "다이어리 작성 중 서버 에러가 발생되었습니다." });
