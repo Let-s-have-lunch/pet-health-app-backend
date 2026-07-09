@@ -43,7 +43,6 @@ router.put(
 router.delete(
     "/:id",
     authenticate,
-    validate(deleteWeightLogSchema), // 삭제 안전장치 스키마
     weightLogController.deleteWeightLog,
 );
 

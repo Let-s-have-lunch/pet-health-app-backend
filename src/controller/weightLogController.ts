@@ -129,7 +129,13 @@ const deleteWeightLog = async (req: AuthRequest<{ id: string }>, res: Response) 
         }
 
         const loginUserId = req.user.id;
-        const id = parseInt(req.params.id, 10);
+        const id = Number(req.params.id);
+
+        //  [여기만 추가!] 라우터의 validate 미들웨어를 빼는 대신, 여기서 안전하게 ID가 숫자인지 검증합니다.
+        if (isNaN(id) || id <= 0) {
+            res.status(400).json({ message: "잘못된 입력값입니다. 올바른 ID 형식이 아닙니다." });
+            return;
+        }
 
         await weightLogService.deleteWeightLog(loginUserId, id);
 
