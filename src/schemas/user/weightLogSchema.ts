@@ -20,15 +20,14 @@ export type UpdateWeightLogInputType = z.infer<typeof updateWeightLogSchema>;
 
 // 3. Get 스키마[cite: 3]
 export const getWeightLogSchema = z.object({
-    id: z.number().positive(),
+    id: z.string(),
 });
 export type GetWeightLogInputType = z.infer<typeof getWeightLogSchema>;
 
 // 4. Delete 스키마[cite: 2]
 export const deleteWeightLogSchema = z.object({
-    id: z.number().positive(),
+    id: z.string(),
 });
-
 export type DeleteWeightLogInputType = z.infer<typeof deleteWeightLogSchema>;
 
 // 5. 몸무게 통계 조회 스키마

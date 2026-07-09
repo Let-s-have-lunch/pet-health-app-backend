@@ -52,7 +52,6 @@ router.put(
 router.delete(
     "/:id",
     authenticate,
-    validate(deleteWaterLogSchema), //[cite: 2]
     waterLogController.deleteWaterLog,
 );
 
