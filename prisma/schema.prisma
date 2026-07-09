@@ -126,9 +126,8 @@ model Inquiry {
 model WalkLog {
   id Int @id @default(autoincrement())
 
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-  deletedAt DateTime?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   walkDate DateTime
   duration Int
