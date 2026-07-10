@@ -2,6 +2,7 @@ import { Response } from "express";
 import { AuthRequest } from "../middlewares/auth.ts";
 import vetRecordService from "../service/vetRecordService.ts";
 
+// Todo: 월요일 백엔드에 이미지 라이브러리 설치하기
 // 1. 병원 기록 생성
 const createVetRecord = async (req: AuthRequest, res: Response) => {
     try {
