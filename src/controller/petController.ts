@@ -51,7 +51,7 @@ const createPet = async (req: AuthRequest, res: Response) => {
             breed: breed ?? null,
             name,
             profileImage: profileImage ?? null,
-            birthdate: birthdate ?? null,
+            birthdate: birthdate ? new Date(birthdate) : null,
             registrationNumber: registrationNumber ?? null,
             gender,
             neutered,

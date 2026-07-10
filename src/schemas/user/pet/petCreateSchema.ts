@@ -11,7 +11,7 @@ export const petCreateSchema = z.object({
     profileImage: z.string().optional(),
     birthdate: z
         .string()
-        .regex(/^\d{8}$/, "생년월일은 8자리 숫자(YYYYMMDD)로 입력해주세요") // ""에서 걸림
+        .regex(/^\d{4}-\d{2}-\d{2}$/, "생년월일은 8자리 숫자(YYYYMMDD)로 입력해주세요") // ""에서 걸림
         .optional() // undefined에 대해서만 통과시킴
         .or(z.literal("")),
     registrationNumber: z.string().optional(),
