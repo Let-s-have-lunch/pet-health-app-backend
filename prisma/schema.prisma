@@ -126,20 +126,15 @@ model Inquiry {
 model WalkLog {
   id Int @id @default(autoincrement())
 
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-  deletedAt DateTime?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-  walkDate  DateTime
-  startTime DateTime
-  endTime   DateTime
-
+  walkDate DateTime
   duration Int
-  distance Float?
+  memo     String?
 
-  memo  String?
   petId Int
-  pet   Pet     @relation(fields: [petId], references: [id])
+  pet   Pet @relation(fields: [petId], references: [id])
 
   @@index([petId])
   @@index([walkDate])

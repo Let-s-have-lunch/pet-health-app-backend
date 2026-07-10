@@ -6,6 +6,7 @@ import { validate } from "../../middlewares/validate.ts";
 import { getAdminStatsSchema } from "../../schemas/admin/adminStatSchema.ts";
 import adminStatController from "../../controller/admin/adminStatController.ts";
 import adminInquiryRouter from "./inquiry/adminInquiryRouter.ts";
+import adminDashboardController from "../../controller/admin/adminDashboardController.ts";
 
 const router = Router();
 
@@ -37,5 +38,8 @@ router.get(
     validate(getAdminStatsSchema), // 연도 검증 스키마 똑같이 사용
     adminStatController.getWalkDurationAverage // 컨트롤러에 새로 만들 함수명
 );
+
+router.get("/summary", adminDashboardController.getDashboardSummary);
+
 
 export default router;

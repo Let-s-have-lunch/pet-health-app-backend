@@ -1,77 +1,172 @@
-import { Request, Response } from "express";
-import {
-    CreateWalkLogInputType,
-    createWalkLogSchema,
-} from "../schemas/user/walkLog/createWalkLogSchema.ts";
+import { AuthRequest } from "../middlewares/auth.ts";
+import { Response } from "express";
+import { WalkLogInputType } from "../schemas/walkLog/walkLogSchema.ts";
 import walkLogService from "../service/walkLogService.ts";
-import { getWalkLogSchema } from "../schemas/user/walkLog/getWalkLogSchema.ts";
-import {
-    UpdateWalkLogInputType,
-    updateWalkLogSchema,
-} from "../schemas/user/walkLog/updateWalkLogSchema.ts";
 
-const createWalkLog = async (req: Request, res: Response) => {
+const createWalkLog = async (req: AuthRequest<{ petId: string }>, res: Response) => {
     try {
-        const data: CreateWalkLogInputType = createWalkLogSchema.parse(req.body);
+        const petId = Number(req.params.petId);
+        if (isNaN(petId)) {
+            res.status(400).json({ message: "유효하지 않은 petId입니다." });
+            return;
+        }
 
-        const result = await walkLogService.createWalkLog(data);
+        if (!req.user) {
+            res.status(401).json({ message: "로그인이 필요한 서비스입니다." });
+            return;
+        }
+        const userId = req.user.id;
 
-        res.status(201).json(result);
+        const walkLogData: WalkLogInputType = req.body;
+
+        const result = await walkLogService.createWalkLog(petId, userId, walkLogData);
+        res.status(201).json({ message: "산책 기록이 성공적으로 등록되었습니다.", data: result });
     } catch (error) {
-        console.log(error);
-
-        res.status(500).json({
-            message: "산책 기록 생성에 실패했습니다.",
-        });
+        if (error instanceof Error) {
+            if (error.message === "NOT_FOUND_PET") {
+                res.status(404).json({ message: "존재하지 않는 펫입니다." });
+                return;
+            }
+            if (error.message === "FORBIDDEN") {
+                res.status(403).json({ message: "산책기록을 생성할 권한이 없습니다." });
+                return;
+            }
+        }
+        res.status(500).json({ message: "산책기록을 생성하는 중 오류가 발생했습니다." });
     }
 };
 
-const getWalkLogById = async (req: Request, res: Response) => {
+const updateWalkLog = async (req: AuthRequest<{ walkLogId: string }>, res: Response) => {
     try {
-        const { id } = getWalkLogSchema.parse(req.params);
-        const result = await walkLogService.getWalkLogById(id);
+        const walkLogId = Number(req.params.walkLogId);
+        if (isNaN(walkLogId)) {
+            res.status(400).json({ message: "유효하지 않은 산책 id입니다." });
+            return;
+        }
 
-        res.status(200).json(result);
+        if (!req.user) {
+            res.status(401).json({ message: "로그인이 필요한 서비스입니다." });
+            return;
+        }
+        const userId = req.user.id;
+
+        const walkLogData: WalkLogInputType = req.body;
+
+        const result = await walkLogService.updateWalkLog(walkLogId, userId, walkLogData);
+        res.status(200).json({ message: "산책기록을 성공적으로 수정했습니다." });
     } catch (error) {
-        res.status(500).json({
-            message: "산책 기록 조회에 실패했습니다.",
-        });
+        if (error instanceof Error) {
+            if (error.message === "NOT_FOUND_WALKLOG") {
+                res.status(404).json({ message: "존재하지 않는 산책기록 입니다." });
+                return;
+            }
+            if (error.message === "FORBIDDEN") {
+                res.status(403).json({ message: "산책기록을 수정할 권한이 없습니다." });
+                return;
+            }
+        }
+        res.status(500).json({ message: "산책기록을 수정하는 중 오류가 발생했습니다." });
     }
 };
 
-const updateWalkLog = async (req: Request, res: Response) => {
+const getWalkLogs = async (req: AuthRequest<{ petId: string }>, res: Response) => {
     try {
-        const id = Number(req.params.id);
-        const data: UpdateWalkLogInputType = updateWalkLogSchema.parse(req.body);
-        const result = await walkLogService.updateWalkLog(id, data);
-        res.status(200).json(result);
+        const petId = Number(req.params.petId);
+        if (isNaN(petId)) {
+            res.status(400).json({ message: "유효하지 않은 petId입니다." });
+            return;
+        }
+
+        if (!req.user) {
+            res.status(401).json({ message: "로그인이 필요한 서비스입니다." });
+            return;
+        }
+        const userId = req.user.id;
+
+        const result = await walkLogService.getWalkLogs(petId, userId);
+        res.status(200).json({ message: "산책기록 목록을 성공적으로 조회했습니다.", data: result });
     } catch (error) {
-        console.log(error);
-        res.status(500).json({
-            message: "산책 기록 수정에 실패했습니다.",
-        });
+        if (error instanceof Error) {
+            if (error.message === "NOT_FOUND_PET") {
+                res.status(404).json({ message: "존재하지 않는 펫입니다." });
+                return;
+            }
+            if (error.message === "FORBIDDEN") {
+                res.status(403).json({ message: "산책기록 목록을 조회할 권한이 없습니다." });
+                return;
+            }
+        }
+        res.status(500).json({ message: "산책기록 목록을 조회하는 중 오류가 발생했습니다." });
     }
 };
 
-const deleteWalkLog = async (req: Request, res: Response) => {
+const deleteWalkLog = async (req: AuthRequest<{ walkLogId: string }>, res: Response) => {
     try {
-        const id = Number(req.params.id);
-        await walkLogService.deleteWalkLog(id);
+        const walkLogId = Number(req.params.walkLogId);
+        if (isNaN(walkLogId)) {
+            res.status(400).json({ message: "유효하지 않은 산책 id입니다." });
+            return;
+        }
+
+        if (!req.user) {
+            res.status(401).json({ message: "로그인이 필요한 서비스입니다." });
+            return;
+        }
+        const userId = req.user.id;
+
+        await walkLogService.deleteWalkLog(walkLogId, userId);
+        res.status(200).json({ message: "산책기록을 성공적으로 삭제했습니다." });
+    } catch (error) {
+        if (error instanceof Error) {
+            if (error.message === "NOT_FOUND_WALKLOG") {
+                res.status(404).json({ message: "존재하지 않는 산책기록 입니다." });
+                return;
+            }
+            if (error.message === "FORBIDDEN") {
+                res.status(403).json({ message: "산책기록을 삭제할 권한이 없습니다." });
+                return;
+            }
+        }
+        res.status(500).json({ message: "산책기록을 삭제하는 중 오류가 발생했습니다." });
+    }
+};
+
+const getWalkLogStats = async (req: AuthRequest<{ petId: string }>, res: Response) => {
+    try {
+        const petId = Number(req.params.petId);
+        if (isNaN(petId)) {
+            res.status(400).json({ message: "유효하지 않은 petId입니다." });
+            return;
+        }
+
+        if (!req.user) {
+            res.status(401).json({ message: "로그인이 필요한 서비스입니다." });
+            return;
+        }
+        const userId = req.user.id;
+
+        const startDate = req.query.startDate as string | undefined;
+        const endDate = req.query.endDate as string | undefined;
+
+        const result = await walkLogService.getWalkLogStats(petId, userId, startDate, endDate);
 
         res.status(200).json({
-            message: "산책 기록이 삭제되었습니다.",
+            message: "산책 통계를 성공적으로 조회했습니다.",
+            data: result,
         });
     } catch (error) {
-        console.log(error);
-        res.status(500).json({
-            message: "산책 기록 삭제에 실패했습니다.",
-        });
+        if (error instanceof Error) {
+            if (error.message === "NOT_FOUND_PET") {
+                res.status(404).json({ message: "존재하지 않는 펫입니다." });
+                return;
+            }
+            if (error.message === "FORBIDDEN") {
+                res.status(403).json({ message: "통계를 조회할 권한이 없습니다." });
+                return;
+            }
+        }
+        res.status(500).json({ message: "산책 통계를 조회하는 중 오류가 발생했습니다." });
     }
 };
 
-export default {
-    createWalkLog,
-    getWalkLogById,
-    updateWalkLog,
-    deleteWalkLog,
-};
+export default { createWalkLog, updateWalkLog, getWalkLogs, deleteWalkLog, getWalkLogStats };
