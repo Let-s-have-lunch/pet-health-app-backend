@@ -6,6 +6,7 @@ const checkPetOwnership = async (userId: number, petId: number) => {
     const pet = await prisma.pet.findFirst({
         where: { id: petId, userId, deletedAt: null },
     });
+
     if (!pet) {
         throw new Error("PET_NOT_FOUND_OR_FORBIDDEN");
     }
