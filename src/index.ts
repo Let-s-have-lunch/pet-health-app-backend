@@ -15,6 +15,7 @@ import diaryRouter from "./routes/diaryRouter.ts";
 import todoRouter from "./routes/todoRouter.ts";
 import homeRouter from "./routes/homeRouter.ts";
 import cors from "cors";
+import replyRouter from "./routes/replyRouter.ts";
 dotenv.config();
 
 const app = express();
@@ -32,6 +33,8 @@ app.use("/notice", noticeRouter);
 app.use("/inquiry", inquiryRouter);
 app.use("/admin", adminRouter);
 app.use("/post", communityPostRouter);
+app.use("/reply", replyRouter);
+
 
 app.use("/pet", petRouter);
 app.use("/diary", diaryRouter);
