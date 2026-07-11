@@ -69,6 +69,13 @@ const deleteWalkLog = async (walkLogId: number, userId: number) => {
     });
 };
 
+const toLocalDateString = (date: Date) => {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
+    return `${year}-${month}-${day}`;
+};
+
 const getWalkLogStats = async (
     petId: number,
     userId: number,
@@ -82,6 +89,7 @@ const getWalkLogStats = async (
         ? new Date(queryStartDate)
         : new Date(new Date().setDate(end.getDate() - 6));
 
+    // 로컬 시간 기준으로 00:00:00 ~ 23:59:59 세팅
     start.setHours(0, 0, 0, 0);
     end.setHours(23, 59, 59, 999);
 
@@ -99,14 +107,16 @@ const getWalkLogStats = async (
     let totalDuration = 0;
     const dailyStats: Record<string, { date: string; walks: number; duration: number }> = {};
 
+    // 💡 1. 빈 껍데기 만들 때 배신자(toISOString) 대신 로컬 함수 사용
     for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
-        const dateStr = d.toISOString().split("T")[0] as string;
+        const dateStr = toLocalDateString(d);
         dailyStats[dateStr] = { date: dateStr, walks: 0, duration: 0 };
     }
 
     for (const log of logs) {
         totalDuration += log.duration;
-        const dateStr = log.walkDate.toISOString().split("T")[0] as string;
+        // 💡 2. DB 데이터 날짜 변환할 때도 로컬 함수 사용
+        const dateStr = toLocalDateString(log.walkDate);
 
         if (dailyStats[dateStr]) {
             dailyStats[dateStr].walks += 1;
@@ -117,7 +127,7 @@ const getWalkLogStats = async (
     return {
         summary: {
             totalWalks: logs.length,
-            totalDuration,
+            totalDuration, // 60분
         },
         graphData: Object.values(dailyStats),
     };
