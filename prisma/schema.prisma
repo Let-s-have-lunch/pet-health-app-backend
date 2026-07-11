@@ -131,7 +131,7 @@ model WalkLog {
 
   walkDate DateTime
   duration Int
-  memo     String?
+  keywords Json     @default("[]")
 
   petId Int
   pet   Pet @relation(fields: [petId], references: [id])

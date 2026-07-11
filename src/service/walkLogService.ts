@@ -28,7 +28,7 @@ const createWalkLog = async (petId: number, userId: number, walkLogData: WalkLog
             petId,
             walkDate: new Date(walkLogData.walkDate),
             duration: walkLogData.duration,
-            memo: walkLogData.memo ?? null,
+            keywords: walkLogData.keywords,
         },
     });
 };
@@ -43,7 +43,7 @@ const updateWalkLog = async (walkLogId: number, userId: number, walkLogData: Wal
         data: {
             walkDate: new Date(walkLogData.walkDate),
             duration: walkLogData.duration,
-            memo: walkLogData.memo ?? null,
+            keywords: walkLogData.keywords,
         },
     });
 };
