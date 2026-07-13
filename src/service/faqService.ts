@@ -61,7 +61,7 @@ const findAllFaqs = async (category?: string): Promise<Faq[]> => {
     });
 };
 
-const createFaq = async (data: CreateFaqDto): Promise<Faq> => {
+const createFaq = async (data: CreateFaqDto, answer: any, category: any): Promise<> => {
     validateCategory(data.category);
     return await prisma.faq.create({
         data: {
@@ -73,7 +73,7 @@ const createFaq = async (data: CreateFaqDto): Promise<Faq> => {
     });
 };
 
-const updateFaq = async (id: number, data: UpdateFaqDto): Promise<Faq> => {
+const updateFaq = async (id: number, data: UpdateFaqDto, answer: any, category: any): Promise<> => {
     await getFaqById(id);   // 존재 여부 확인
 
     if (data.category) {
