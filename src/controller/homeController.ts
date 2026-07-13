@@ -18,17 +18,7 @@ export const getHomeDashboard = async (req: Request, res: Response) => {
         }
 
         // 💡 homeService에서 Promise.all 함수를 호출합니다!
-        // const dashboardData = await homeService.getPetDashboardWithPromiseAll(petId, dateStr);
-        const dashboardData = {
-            date: dateStr,
-            walk: { count: 8 },
-            weight: { value: 6.2 },
-            water: { totalAmount: 400 },
-            vetRecord: {
-                purpose: "정기 예방접종",
-                hospitalName: "튼튼동물병원",
-            },
-        };
+        const dashboardData = await homeService.getPetDashboardWithPromiseAll(petId, dateStr);
 
         return res.status(200).json({
             success: true,

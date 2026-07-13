@@ -27,12 +27,12 @@ import prisma from "../config/prisma.ts";
     const [walkCount, latestWeight, waterSum, upcomingVet] = await Promise.all([
         // 1. 오늘 산책 횟수 카운트
         prisma.walkLog.count({
-            where: { petId, deletedAt: null, createdAt: { gte: startOfDay, lte: endOfDay } },
+            where: { petId, createdAt: { gte: startOfDay, lte: endOfDay } },
         }),
         // 2. 가장 최근 몸무게 기록 1개
         prisma.weightLog.findFirst({
             where: { petId, deletedAt: null },
-            orderBy: { createdAt: "desc" },
+            orderBy: { recordDate: "desc" },
         }),
         // 3. 오늘 마신 물 총합 합산
         prisma.waterLog.aggregate({
