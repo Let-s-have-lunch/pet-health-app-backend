@@ -14,7 +14,7 @@ export interface UpdateFaqDto {
 }
 
 // 반려동물 서비스 전용 카테고리 정의
-const VALID_CATEGORIES = ['HEALTH', 'NUTRITION', 'BEHAVIOR', 'GROOMING', 'ETC'];
+const VALID_CATEGORIES = ['HEALTH', 'NUTRITION', 'BEHAVIOR', 'GROOMING', 'ADOPTION', 'WALKING', 'ETC'];
 
 // 1. FAQ 목록 조회
 const getFaqs = async (req: Request, res: Response): Promise<void> => {

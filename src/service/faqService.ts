@@ -17,8 +17,8 @@ export const VALID_PET_CATEGORIES = [
     'NUTRITION', // 영양/사료
     'BEHAVIOR',  // 훈련/행동
     'GROOMING',  // 위생/미용
-    `ADOPTION`, //  추가
-    `WALKING`, //   추가
+    'ADOPTION', //  추가
+    'WALKING', //   추가
     'ETC'        // 기타
 ] as const;
 
@@ -61,10 +61,24 @@ const findAllFaqs = async (category?: string): Promise<Faq[]> => {
     });
 };
 
+const createFaq = async (data: CreateFaqDto): Promise<Faq> => {
+    validateCategory(data.category);
+    return await prisma.faq.create({
+        data: {
+            question: data.question,
+            answer: data.answer,
+            // 💡 "as any"를 붙여서 까탈스러운 타입스크립트를 조용히 시킵니다!
+            category: data.category as any
+        },
+    });
+};
+
 const updateFaq = async (id: number, data: UpdateFaqDto): Promise<Faq> => {
     await getFaqById(id);   // 존재 여부 확인
 
-    id (data.category) validateCategory(data.catagory)
+    if (data.category) {
+        validateCategory(data.category);
+    }
 
     // 💡 3. [방어적 업데이트] 입력된 값만 골라서 업데이트 (undefined 제거)
     const updateData = {
