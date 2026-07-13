@@ -55,6 +55,7 @@ const updateWalkLog = async (req: AuthRequest<{ walkLogId: string }>, res: Respo
         const result = await walkLogService.updateWalkLog(walkLogId, userId, walkLogData);
         res.status(200).json({ message: "산책기록을 성공적으로 수정했습니다." });
     } catch (error) {
+        console.log(error)
         if (error instanceof Error) {
             if (error.message === "NOT_FOUND_WALKLOG") {
                 res.status(404).json({ message: "존재하지 않는 산책기록 입니다." });

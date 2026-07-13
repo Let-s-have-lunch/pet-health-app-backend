@@ -18,6 +18,16 @@ const checkPetOwnership = async (userId: number, petId: number) => {
 const createWaterLog = async (userId: number, data: CreateWaterLogInputType) => {
     await checkPetOwnership(userId, data.petId);
 
+    const targetDate = new Date(data.recordDate);
+
+    const existingLog = await prisma.waterLog.findFirst({
+        where: { petId: data.petId, recordDate: targetDate },
+    });
+
+    if (existingLog) {
+        throw new Error("ALREADY_EXISTS_WATERLOG");
+    }
+
     const input = {
         ...data,
         recordDate: new Date(data.recordDate),
@@ -55,7 +65,20 @@ const getWaterLogById = async (userId: number, id: number) => {
 
 // 4. 수정
 const updateWaterLog = async (userId: number, id: number, data: UpdateWaterLogInputType) => {
-    await getWaterLogById(userId, id);
+    const existingLog = await getWaterLogById(userId, id);
+    const targetDate = new Date(data.recordDate);
+
+    const duplicateLog = await prisma.waterLog.findFirst({
+        where: {
+            petId: existingLog.petId,
+            recordDate: targetDate,
+            id: { not: id},
+        }
+    })
+
+    if (duplicateLog) {
+        throw new Error("ALREADY_EXISTS_WATERLOG");
+    }
 
     const input = {
         ...data,

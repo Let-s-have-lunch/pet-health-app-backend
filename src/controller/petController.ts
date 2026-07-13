@@ -1,7 +1,43 @@
-import { Request, Response } from "express";
+import { Response } from "express";
 import petService from "../service/petService.ts";
-import { PetCreateInput, PetUpdateInput } from "../generated/prisma/models/Pet.ts";
+import { PetCreateInput } from "../generated/prisma/models/Pet.ts";
 import { AuthRequest } from "../middlewares/auth.ts";
+import { PetUpdateInputType } from "../schemas/user/pet/petUpdateSchema.ts";
+
+const getPet = async (req: AuthRequest<{ petId: string }>, res: Response) => {
+    try {
+        if (!req.user) {
+            res.status(401).json({ message: "인증되지 않은 사용자입니다. " });
+            return;
+        }
+
+        const petId = Number(req.params.petId);
+        if (isNaN(petId)) {
+            res.status(400).json({ message: "유효하지 않은 반려동물 ID 입니다." });
+            return;
+        }
+
+        const userId = req.user.id;
+        const pet = await petService.getPet(userId, petId);
+
+        if (!pet) {
+            res.status(404).json({
+                message: "반려동물을 찾을 수 없습니다.",
+            });
+            return;
+        }
+
+        res.status(200).json({
+            message: "반려동물 정보를 조회했습니다.",
+            data: pet,
+        });
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({
+            message: "서버 에러가 발생했습니다.",
+        });
+    }
+};
 
 const getMyPets = async (req: AuthRequest, res: Response) => {
     try {
@@ -15,7 +51,7 @@ const getMyPets = async (req: AuthRequest, res: Response) => {
         const pets = await petService.getMyPets(userId);
 
         res.status(200).json({
-            message: "반려동물 정보를 조회했습니다.",
+            message: "반려동물 목록 정보를 조회했습니다.",
             data: pets,
         });
     } catch (error) {
@@ -86,7 +122,10 @@ const updatePet = async (req: AuthRequest<{ petId: string }>, res: Response) => 
         }
 
         const userId = req.user.id;
-        const input: PetUpdateInput = req.body;
+        const input: PetUpdateInputType = req.body;
+
+        console.log("update input");
+        console.log(input);
 
         const result = await petService.updatePet(userId, petId, input);
 
@@ -95,7 +134,8 @@ const updatePet = async (req: AuthRequest<{ petId: string }>, res: Response) => 
             data: result,
         });
     } catch (error) {
-        console.log(error);
+        console.error("updatePet 오류");
+        console.error(error);
         if (error instanceof Error) {
             if (error.message === "PET_NOT_FOUND") {
                 return res.status(404).json({
@@ -142,6 +182,7 @@ const deletePet = async (req: AuthRequest<{ petId: string }>, res: Response) => 
 };
 
 export default {
+    getPet,
     getMyPets,
     createPet,
     updatePet,

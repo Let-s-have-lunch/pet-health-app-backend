@@ -24,6 +24,9 @@ const createWaterLog = async (req: AuthRequest, res: Response) => {
                     message: "해당 반려동물에 접근할 권한이 없거나 존재하지 않습니다.",
                 });
                 return;
+            } else if (error.message === "ALREADY_EXISTS_WATERLOG") {
+                res.status(409).json({ message: "이미 해당 날짜에 작성된 기록이 있습니다." });
+                return;
             }
         }
         console.log(error);
@@ -113,6 +116,9 @@ const updateWaterLog = async (req: AuthRequest<{ id: string }>, res: Response) =
             if (error.message === "WATER_LOG_NOT_FOUND_OR_FORBIDDEN") {
                 res.status(404).json({ message: "기록을 찾을 수 없거나 접근 권한이 없습니다." });
                 return;
+            } else if (error.message === "ALREADY_EXISTS_WATERLOG") {
+                res.status(409).json({ message: "이미 해당일에 작성된 기록이 있습니다." });
+                return;
             }
         }
         console.log(error);
@@ -164,16 +170,21 @@ const getWaterLogStats = async (req: AuthRequest<{ petId: string }>, res: Respon
         const baseDate = req.query.baseDate as string;
 
         // 서비스로 토스해서 가공된 차트 데이터를 받아옵니다.
-        const result = await waterLogService.getWaterLogStats(loginUserId, petId, { period, baseDate });
+        const result = await waterLogService.getWaterLogStats(loginUserId, petId, {
+            period,
+            baseDate,
+        });
 
         res.status(200).json({
             message: "음수량 통계 데이터 가공이 완료되었습니다.",
-            data: result
+            data: result,
         });
     } catch (error) {
         if (error instanceof Error) {
             if (error.message === "PET_NOT_FOUND_OR_FORBIDDEN") {
-                res.status(403).json({ message: "해당 반려동물에 접근할 권한이 없거나 존재하지 않습니다." });
+                res.status(403).json({
+                    message: "해당 반려동물에 접근할 권한이 없거나 존재하지 않습니다.",
+                });
                 return;
             }
         }

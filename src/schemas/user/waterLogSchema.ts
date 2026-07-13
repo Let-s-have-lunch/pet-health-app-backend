@@ -14,7 +14,6 @@ export const updateWaterLogSchema = z.object({
     recordDate: z.string(),
     amount: z.number().positive({ message: "음수량은 0보다 큰 숫자여야 합니다." }),
     memo: z.string().optional(),
-    petId: z.number().int().positive(),
 });
 export type UpdateWaterLogInputType = z.infer<typeof updateWaterLogSchema>;
 
