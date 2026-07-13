@@ -3,6 +3,13 @@ import { PrismaClient, Faq } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
+// 💡 1. [프로의 기술] 커스텀 에러 클래스 (에러 관리가 깔끔해집니다)
+class AppError extends Error {
+    constructor(public message: string, public status: number) {
+        super(message);
+    }
+}
+
 // 💡 반려동물 도메인 핵심 키워드들을 상수로 정의합니다.
 // 이 리스트가 우리 서비스의 핵심 '반려동물 FAQ 분류'가 됩니다.
 export const VALID_PET_CATEGORIES = [
@@ -30,58 +37,55 @@ export interface UpdateFaqDto {
     category?: PetCategory;
 }
 
-const getFaqById = async (id: number): Promise<Faq> => {
-    const faq = await prisma.faq.findUnique({ where: { id } });
-    if (!faq) {
-        const error = new Error("해당 FAQ를 찾을 수 없습니다.") as any;
-        error.status = 404;
-        throw error;
+// 💡 2. [검증 로직 공통화]
+const validateCategory = (category: string) => {
+    if (!VALID_PET_CATEGORIES.includes(category as any)) {
+        throw new AppError("유효하지 않은 반려동물 카테고리입니다.", 400);
     }
+};
+
+const getFaqById = async (id: number): Promise<Faq> => {
+    // 💡 isActive가 true인 것만 조회 (삭제된 데이터는 조회 불가)
+    const faq = await prisma.faq.findUnique({ where: { id, isActive: true } });
+    if (!faq) throw new AppError("해당 FAQ를 찾을 수 없습니다.",404);
     return faq;
 };
 
 const findAllFaqs = async (category?: string): Promise<Faq[]> => {
     return await prisma.faq.findMany({
-        where: category ? { category } : {},
-        orderBy: { id: "desc" },
-    });
-};
-
-const createFaq = async (data: CreateFaqDto, answer: any, category: any): Promise<> => {
-    // 💡 반려동물 서비스 규칙 검증
-    if (!VALID_PET_CATEGORIES.includes(data.category)) {
-        throw new Error("유효하지 않은 반려동물 카테고리입니다.");
-    }
-    return await prisma.faq.create({
-        data: {
-            question: data.question,
-            answer: data.answer,
-            category: data.category
+        where: {
+            isActive: true, // 기본 필터: 활성화된 FAQ만 노출
+            ...(category && { category}),
         },
+        orderBy: { displayOrder: "asc" },   //생성순이 아니라, 우선순위대로 정렬
     });
 };
 
-const updateFaq = async (id: number, data: UpdateFaqDto, answer: any, category: any): Promise<> => {
-    await getFaqById(id);
+const updateFaq = async (id: number, data: UpdateFaqDto): Promise<Faq> => {
+    await getFaqById(id);   // 존재 여부 확인
 
-    // 💡 수정 시에도 카테고리가 들어온다면 검증
-    if (data.category && !VALID_PET_CATEGORIES.includes(data.category)) {
-        throw new Error("유효하지 않은 반려동물 카테고리입니다.");
-    }
+    id (data.category) validateCategory(data.catagory)
+
+    // 💡 3. [방어적 업데이트] 입력된 값만 골라서 업데이트 (undefined 제거)
+    const updateData = {
+        ...(data.question && { question: data.question }),
+        ...(data.answer && { answer: data.answer }),
+        ...(data.category && { category: data.category }),
+    };
 
     return await prisma.faq.update({
         where: { id },
-        data: {
-            question: data.question,
-            answer: data.answer,
-            category: data.category
-        },
+        data: updateData,
     });
 };
 
 const deleteFaq = async (id: number): Promise<Faq> => {
     await getFaqById(id);
-    return await prisma.faq.delete({ where: { id } });
+    // 💡 진짜 삭제하지 않고, 활성 상태만 끕니다 (Soft Delete)
+    return await prisma.faq.update({
+        where: { id },
+        data: { isActive: false },
+    });
 };
 
 export default {
