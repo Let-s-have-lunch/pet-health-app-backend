@@ -1,7 +1,8 @@
-import { Request, Response } from "express";
+import { Response } from "express";
 import petService from "../service/petService.ts";
-import { PetCreateInput, PetUpdateInput } from "../generated/prisma/models/Pet.ts";
+import { PetCreateInput } from "../generated/prisma/models/Pet.ts";
 import { AuthRequest } from "../middlewares/auth.ts";
+import { PetUpdateInputType } from "../schemas/user/pet/petUpdateSchema.ts";
 
 const getPet = async (req: AuthRequest<{ petId: string }>, res: Response) => {
     try {
@@ -121,7 +122,10 @@ const updatePet = async (req: AuthRequest<{ petId: string }>, res: Response) => 
         }
 
         const userId = req.user.id;
-        const input: PetUpdateInput = req.body;
+        const input: PetUpdateInputType = req.body;
+
+        console.log("update input");
+        console.log(input);
 
         const result = await petService.updatePet(userId, petId, input);
 
@@ -130,7 +134,8 @@ const updatePet = async (req: AuthRequest<{ petId: string }>, res: Response) => 
             data: result,
         });
     } catch (error) {
-        console.log(error);
+        console.error("updatePet 오류");
+        console.error(error);
         if (error instanceof Error) {
             if (error.message === "PET_NOT_FOUND") {
                 return res.status(404).json({

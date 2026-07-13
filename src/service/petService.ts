@@ -1,6 +1,7 @@
 import prisma from "../config/prisma.ts";
 import { Prisma } from "../generated/prisma/client.ts";
-import { PetCreateInput, PetUpdateInput } from "../generated/prisma/models/Pet.ts";
+import { PetCreateInput } from "../generated/prisma/models/Pet.ts";
+import { PetUpdateInputType } from "../schemas/user/pet/petUpdateSchema.ts";
 
 const getPet = async (userId: number, petId: number) => {
     return prisma.pet.findFirst({
@@ -43,7 +44,7 @@ const createPet = async (data: PetCreateInput) => {
     }
 };
 
-const updatePet = async (userId: number, petId: number, input: PetUpdateInput) => {
+const updatePet = async (userId: number, petId: number, input: PetUpdateInputType, ) => {
     const existPet = await prisma.pet.findFirst({
         where: {
             id: petId,
@@ -61,7 +62,15 @@ const updatePet = async (userId: number, petId: number, input: PetUpdateInput) =
             id: petId,
         },
         data: {
-            ...input,
+                name: input.name,
+                species: input.species,
+                breed: input.breed,
+                gender: input.gender,
+                neutered: input.neutered,
+                registrationNumber: input.registrationNumber,
+                profileImage: input.profileImage,
+
+                birthdate: input.birthdate ? new Date(input.birthdate) : null,
         },
     });
 };
