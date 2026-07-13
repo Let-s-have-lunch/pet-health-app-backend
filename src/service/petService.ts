@@ -2,6 +2,16 @@ import prisma from "../config/prisma.ts";
 import { Prisma } from "../generated/prisma/client.ts";
 import { PetCreateInput, PetUpdateInput } from "../generated/prisma/models/Pet.ts";
 
+const getPet = async (userId: number, petId: number) => {
+    return prisma.pet.findFirst({
+        where: {
+            userId,
+            id: petId,
+            deletedAt: null,
+        },
+    });
+};
+
 const getMyPets = async (userId: number) => {
     return prisma.pet.findMany({
         where: {
@@ -75,11 +85,12 @@ const deletePet = async (userId: number, petId: number) => {
         },
         data: {
             deletedAt: new Date(),
-        }
+        },
     });
 };
 
 export default {
+    getPet,
     getMyPets,
     createPet,
     updatePet,
