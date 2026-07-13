@@ -127,7 +127,7 @@ const getWalkLogStats = async (
     return {
         summary: {
             totalWalks: logs.length,
-            totalDuration, // 60분
+            totalDuration,
         },
         graphData: Object.values(dailyStats),
     };
