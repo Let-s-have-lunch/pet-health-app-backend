@@ -225,9 +225,29 @@ model Reply {
   post Post @relation(fields: [postId], references: [id])
 }
 
+// 1. 반려동물 카테고리 정의 (코드에서의 타입과 일치시킵니다)
+enum Category {
+  HEALTH
+  NUTRITION
+  BEHAVIOR
+  GROOMING
+  ADOPTION // 추가: 내장칩, 등록, 입양 관련
+  WALKING // 추가: 산책 예절, 산책 코스, 외출 관련
+  ETC
+}
+
+// 2. 반려동물 종류 정의 (선택사항이지만 매우 유용합니다)
+enum PetType {
+  DOG
+  CAT
+  SMALL_ANIMAL
+  ETC
+}
+
 model Faq {
   id           Int      @id @default(autoincrement())
-  category     String
+  category     Category // 💡 String 대신 Enum을 써서 잘못된 값이 들어오는 것을 원천 봉쇄합니다.
+  petType      PetType  @default(ETC) @map("pet_type") // 💡 어떤 동물을 위한 정보인지 구분합니다.
   question     String
   answer       String   @db.Text
   displayOrder Int      @default(0) @map("display_order")
