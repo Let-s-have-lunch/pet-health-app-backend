@@ -27,6 +27,7 @@ app.use(cors({ origin: ["http://localhost:8081", "http://localhost:8082", "http:
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));
 
 app.use("/home", homeRouter);
 app.use("/user", userRouter);
@@ -46,7 +47,6 @@ app.use("/walk-logs", walkLogRouter);
 app.use("/vet-records", vetRecordRouter);
 app.use("/weight-logs", weightLogRouter);
 app.use("/water-logs", waterLogRouter);
-app.use("/uploads", express.static("uploads"));
 
 app.listen(PORT, () => {
     console.log(`서버 실행됨! http://localhost:${PORT}`);

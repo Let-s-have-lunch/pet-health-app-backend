@@ -15,6 +15,7 @@ const router = Router();
 router.post(
     "/",
     authenticate,
+    upload.single("image"),
     validate(CreateVetRecordSchema),
     vetRecordController.createVetRecord,
 );
