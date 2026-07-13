@@ -8,7 +8,6 @@ export const CreateVetRecordSchema = z.object({
     diagnosis: z.string().optional(),
     treatment: z.string().optional(),
     cost: z.coerce.number().int().nonnegative().optional(), // 👈 .nonnegative()로 변경 (0원 허용)
-    receiptImage: z.string().optional(),
     memo: z.string().optional(),
     petId: z.coerce.number().int().positive(), // 👈 형변환 유지
 });

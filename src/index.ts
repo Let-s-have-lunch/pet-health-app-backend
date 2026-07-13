@@ -16,6 +16,7 @@ import todoRouter from "./routes/todoRouter.ts";
 import homeRouter from "./routes/homeRouter.ts";
 import cors from "cors";
 import replyRouter from "./routes/replyRouter.ts";
+import path from "path";
 dotenv.config();
 
 const app = express();
@@ -45,6 +46,7 @@ app.use("/walk-logs", walkLogRouter);
 app.use("/vet-records", vetRecordRouter);
 app.use("/weight-logs", weightLogRouter);
 app.use("/water-logs", waterLogRouter);
+app.use("/uploads", express.static("uploads"));
 
 app.listen(PORT, () => {
     console.log(`서버 실행됨! http://localhost:${PORT}`);

@@ -12,23 +12,26 @@ const checkPetOwnership = async (userId: number, petId: number) => {
     }
 };
 
-// 1. 생성 (여기서 에러가 나던 부분을 해결했습니다!)
-const createVetRecord = async (userId: number, data: CreateVetRecordInputType) => {
+// 1. 생성 (컨트롤러에서 보내는 3개 인자를 정확히 받도록 수정)
+const createVetRecord = async (
+    userId: number,
+    data: CreateVetRecordInputType,
+    imagePath: string | null,
+) => {
     await checkPetOwnership(userId, data.petId);
 
-    // 💡 C님의 walkLog 방식 그대로, undefined일 수 있는 모든 필드에 ?? null 을 붙여줍니다.
     const input = {
         ...data,
         visitDate: new Date(data.visitDate),
         diagnosis: data.diagnosis ?? null,
         treatment: data.treatment ?? null,
         cost: data.cost ?? null,
-        receiptImage: data.receiptImage ?? null,
+        receiptImage: imagePath, // 💡 컨트롤러에서 받은 경로 사용
         memo: data.memo ?? null,
     };
 
     return prisma.vetRecord.create({
-        data: input, // 👈 이제 타입이 완벽히 맞아떨어져서 빨간줄이 사라집니다!
+        data: input,
     });
 };
 
@@ -56,7 +59,7 @@ const getVetRecordById = async (userId: number, id: number) => {
     return record;
 };
 
-// 4. 수정 (생성과 동일하게 ?? null 처리)
+// 4. 수정 (이전 코드 그대로 유지)
 const updateVetRecord = async (userId: number, id: number, data: CreateVetRecordInputType) => {
     await getVetRecordById(userId, id);
 
@@ -66,7 +69,7 @@ const updateVetRecord = async (userId: number, id: number, data: CreateVetRecord
         diagnosis: data.diagnosis ?? null,
         treatment: data.treatment ?? null,
         cost: data.cost ?? null,
-        receiptImage: data.receiptImage ?? null,
+        receiptImage: data.receiptImage ?? null, // 기존 로직 유지
         memo: data.memo ?? null,
     };
 

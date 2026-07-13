@@ -2,21 +2,20 @@ import { Router } from "express";
 import vetRecordController from "../controller/vetRecordController.ts";
 import { authenticate } from "../middlewares/auth.ts";
 import { validate } from "../middlewares/validate.ts";
-// 💡 팀 규칙에 맞춰 쪼개놓은 스키마들을 전부 가져옵니다!
 import {
     getVetRecordSchema,
     deleteVetRecordSchema,
     UpdateVetRecordSchema,
     CreateVetRecordSchema,
 } from "../schemas/user/vetRecordSchema.ts";
-
+import { upload } from "../middlewares/multer.ts";
 const router = Router();
 
 // 1. 병원 기록 생성
 router.post(
     "/",
     authenticate,
-    validate(CreateVetRecordSchema), // 👈 생성 검증 스키마 적용[cite: 1]
+    validate(CreateVetRecordSchema),
     vetRecordController.createVetRecord,
 );
 
