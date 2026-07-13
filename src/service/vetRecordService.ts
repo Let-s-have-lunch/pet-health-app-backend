@@ -69,7 +69,6 @@ const updateVetRecord = async (userId: number, id: number, data: CreateVetRecord
         diagnosis: data.diagnosis ?? null,
         treatment: data.treatment ?? null,
         cost: data.cost ?? null,
-        receiptImage: data.receiptImage ?? null, // 기존 로직 유지
         memo: data.memo ?? null,
     };
 

@@ -4,7 +4,6 @@ import { authenticate } from "../middlewares/auth.ts";
 import { validate } from "../middlewares/validate.ts";
 import {
     getVetRecordSchema,
-    deleteVetRecordSchema,
     UpdateVetRecordSchema,
     CreateVetRecordSchema,
 } from "../schemas/user/vetRecordSchema.ts";
@@ -36,7 +35,7 @@ router.get(
 router.put(
     "/:id",
     authenticate,
-    validate(UpdateVetRecordSchema), // 👈 수정 검증 스키마 적용[cite: 4]
+    validate(UpdateVetRecordSchema),
     vetRecordController.updateVetRecord,
 );
 
@@ -44,7 +43,6 @@ router.put(
 router.delete(
     "/:id",
     authenticate,
-    validate(deleteVetRecordSchema), // 👈 삭제 검증 스키마 적용[cite: 2]
     vetRecordController.deleteVetRecord,
 );
 

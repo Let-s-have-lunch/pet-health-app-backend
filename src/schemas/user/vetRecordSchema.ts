@@ -23,7 +23,7 @@ export const UpdateVetRecordSchema = z.object({
     cost: z.coerce.number().int().nonnegative().optional(), // 👈 z.coerce 및 nonnegative 추가
     receiptImage: z.string().optional(),
     memo: z.string().optional(),
-    petId: z.coerce.number().int().positive(), // 👈 z.coerce 추가
+    petId: z.coerce.number().int().positive().optional(),
 });
 export type UpdateVetRecordInputType = z.infer<typeof UpdateVetRecordSchema>;
 
