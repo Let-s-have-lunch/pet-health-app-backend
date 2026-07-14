@@ -16,6 +16,13 @@ export const createFaq = async (req: Request, res: Response): Promise<void> => {
 export const updateFaq = async (req: Request<{ id: string }>, res: Response): Promise<void> => {
     try {
         const id = Number(req.params.id);
+
+        // 추가된 방어 로직
+        if (isNaN(id)) {
+            res.status(400).json({ success: false, message: "유효하지 않은 FAQ ID입니다." });
+            return;
+        }
+
         const { question, answer } = req.body;
         const updatedFaq = await faqService.updateFaq(id, question, answer);
         res.status(200).json({ success: true, data: updatedFaq });
