@@ -229,3 +229,12 @@ model Reply {
   @@index([userId])
   @@index([communityPostId])
 }
+
+model Faq {
+  id        Int      @id @default(autoincrement())
+  question  String
+  answer    String   @db.Text
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@map("faqs")
+}

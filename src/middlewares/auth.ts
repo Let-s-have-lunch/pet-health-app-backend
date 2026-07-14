@@ -60,14 +60,22 @@ export const authenticate = async (req: AuthRequest, res: Response, next: NextFu
     }
 };
 
+// ... (기존 authenticate 함수 코드 이후 바로 아래에 작성)
+
 export const requiredAdmin = async (req: AuthRequest, res: Response, next: NextFunction) => {
+    // 1. 먼저 로그인(인증) 정보가 있는지 확인
     if (!req.user) {
         res.status(401).json({ message: "인증 정보가 없습니다. 먼저 로그인 해주세요." });
         return;
     }
+
+    // 2. 관리자 권한(RoleType.ADMIN)인지 확인
     if (req.user.role !== RoleType.ADMIN) {
+        // [수정 포인트] return을 명시해야 관리자가 아닐 때 여기서 응답이 종료됩니다.
         res.status(403).json({ message: "해당 기능에 접근 할 수 있는 관리자 권한이 없습니다." });
         return;
     }
+
+    // 3. 관리자라면 다음 컨트롤러로 이동
     next();
 };
