@@ -22,6 +22,7 @@ const createWalkLog = async (req: AuthRequest<{ petId: string }>, res: Response)
         const result = await walkLogService.createWalkLog(petId, userId, walkLogData);
         res.status(201).json({ message: "산책 기록이 성공적으로 등록되었습니다.", data: result });
     } catch (error) {
+        console.log(error);
         if (error instanceof Error) {
             if (error.message === "NOT_FOUND_PET") {
                 res.status(404).json({ message: "존재하지 않는 펫입니다." });

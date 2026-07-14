@@ -95,6 +95,7 @@ const getVetRecordById = async (req: AuthRequest<{ id: string }>, res: Response)
 };
 
 // 4. 병원 기록 수정
+// 4. 병원 기록 수정
 const updateVetRecord = async (req: AuthRequest<{ id: string }>, res: Response) => {
     try {
         if (!req.user) {
@@ -105,7 +106,9 @@ const updateVetRecord = async (req: AuthRequest<{ id: string }>, res: Response) 
         const loginUserId = req.user.id;
         const id = parseInt(req.params.id, 10);
 
-        const result = await vetRecordService.updateVetRecord(loginUserId, id, req.body);
+        const imagePath: string | null = req.file ? `/uploads/${req.file.filename}` : null;
+
+        const result = await vetRecordService.updateVetRecord(loginUserId, id, req.body, imagePath);
 
         res.status(200).json({
             message: "병원 기록이 성공적으로 수정되었습니다.",

@@ -1,5 +1,6 @@
 import prisma from "../config/prisma.ts";
 import { CreateVetRecordInputType } from "../schemas/user/vetRecordSchema.ts";
+import { VetRecordCreateInput } from "../generated/prisma/models.ts";
 
 // 반려동물 소유권 확인 (내부 헬퍼 함수)
 const checkPetOwnership = async (userId: number, petId: number) => {
@@ -20,14 +21,20 @@ const createVetRecord = async (
 ) => {
     await checkPetOwnership(userId, data.petId);
 
-    const input = {
-        ...data,
+    const input: VetRecordCreateInput = {
+        hospitalName: data.hospitalName,
+        visitPurpose: data.visitPurpose,
         visitDate: new Date(data.visitDate),
         diagnosis: data.diagnosis ?? null,
         treatment: data.treatment ?? null,
-        cost: data.cost ?? null,
+        cost: data.cost ? data.cost : 0,
         receiptImage: imagePath, // 💡 컨트롤러에서 받은 경로 사용
         memo: data.memo ?? null,
+        pet: {
+            connect: {
+                id: data.petId,
+            },
+        },
     };
 
     return prisma.vetRecord.create({
@@ -60,10 +67,16 @@ const getVetRecordById = async (userId: number, id: number) => {
 };
 
 // 4. 수정 (이전 코드 그대로 유지)
-const updateVetRecord = async (userId: number, id: number, data: CreateVetRecordInputType) => {
+// 4. 수정 (기존 로직 유지 + imagePath 선택적 추가)
+const updateVetRecord = async (
+    userId: number,
+    id: number,
+    data: CreateVetRecordInputType,
+    imagePath?: string | null // 💡 추가: 선택적 인자
+) => {
     await getVetRecordById(userId, id);
 
-    const input = {
+    const input: any = { // 타입을 any로 해야 receiptImage 필드 추가 가능
         ...data,
         visitDate: new Date(data.visitDate),
         diagnosis: data.diagnosis ?? null,
@@ -71,6 +84,11 @@ const updateVetRecord = async (userId: number, id: number, data: CreateVetRecord
         cost: data.cost ?? null,
         memo: data.memo ?? null,
     };
+
+    // 💡 이미지가 새로 들어왔을 때만 DB 데이터에 포함
+    if (imagePath) {
+        input.receiptImage = imagePath;
+    }
 
     return prisma.vetRecord.update({
         where: { id },

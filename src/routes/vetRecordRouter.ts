@@ -35,6 +35,7 @@ router.get(
 router.put(
     "/:id",
     authenticate,
+    upload.single("image"),
     validate(UpdateVetRecordSchema),
     vetRecordController.updateVetRecord,
 );
