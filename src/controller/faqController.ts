@@ -16,18 +16,35 @@ export interface UpdateFaqDto {
 // 반려동물 서비스 전용 카테고리 정의
 const VALID_CATEGORIES = ['HEALTH', 'NUTRITION', 'BEHAVIOR', 'GROOMING', 'ADOPTION', 'WALKING', 'ETC'];
 
+// 💡 [추가됨] 질문, 답변 스키마 검증 함수 (빈 문자열 및 타입 검사)
+const validateSchema = (question?: any, answer?: any) => {
+    if (question !== undefined && (typeof question !== 'string' || question.trim() === '')) {
+        return "질문(question)은 비어있지 않은 문자열이어야 합니다.";
+    }
+    if (answer !== undefined && (typeof answer !== 'string' || answer.trim() === '')) {
+        return "답변(answer)은 비어있지 않은 문자열이어야 합니다.";
+    }
+    return null; // 에러가 없으면 null 반환
+};
+
 // 1. FAQ 목록 조회
 const getFaqs = async (req: Request, res: Response): Promise<void> => {
     try {
-        const { category } = req.query;
-        // 카테고리 필터링이 있다면 유효성 체크
-        if (category && typeof category === 'string' && !VALID_CATEGORIES.includes(category)) {
+        // 💡 [수정됨] 쿼리스트링으로 page, size 가져오기 (기본값: 1페이지, 10개씩)
+        const page = parseInt(req.query.page as string) || 1;
+        const size = parseInt(req.query.size as string) || 10;
+        const category = req.query.category as string;
+
+        if (category && !VALID_CATEGORIES.includes(category)) {
             res.status(400).json({ success: false, message: "유효하지 않은 카테고리입니다." });
             return;
         }
 
+        // 💡 [수정됨] 서비스로 page와 size 값 넘겨주기
         const faqs = await faqService.findAllFaqs(
-            typeof category === "string" ? category : undefined
+            category ? category : undefined,
+            page,
+            size
         );
 
         res.status(200).json({
@@ -81,7 +98,13 @@ const createFaq = async (req: Request, res: Response): Promise<void> => {
             return;
         }
 
-        // 반려동물 카테고리 유효성 검사
+        // 💡 [추가됨] 질문, 답변 스키마 검증
+        const schemaError = validateSchema(question, answer);
+        if (schemaError) {
+            res.status(400).json({ success: false, message: schemaError });
+            return;
+        }
+
         if (!VALID_CATEGORIES.includes(category)) {
             res.status(400).json({ success: false, message: `카테고리는 다음 중 하나여야 합니다: ${VALID_CATEGORIES.join(', ')}` });
             return;
@@ -106,7 +129,13 @@ const updateFaq = async (req: Request<{ id: string }>, res: Response): Promise<v
             return;
         }
 
-        // 카테고리 업데이트 시 유효성 검사
+        // 💡 [추가됨] 질문, 답변 스키마 검증
+        const schemaError = validateSchema(question, answer);
+        if (schemaError) {
+            res.status(400).json({ success: false, message: schemaError });
+            return;
+        }
+
         if (category && !VALID_CATEGORIES.includes(category)) {
             res.status(400).json({ success: false, message: "유효하지 않은 카테고리입니다." });
             return;
