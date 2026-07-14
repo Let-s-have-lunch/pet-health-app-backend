@@ -1,7 +1,7 @@
 import express from 'express';
-import adminFaqController from "../controller/adminFaqController";
-import { validate } from "../middlewares/validate"; // 공통 검증 미들웨어
-import { createFaqSchema, updateFaqSchema } from "../schemas/faqSchema"; // 4번에서 만들 스키마
+import { validate } from "../../middlewares/validate.ts";
+import { faqSchema } from "../../schemas/faqSchema.ts";
+import adminFaqController from "../../controller/admin/adminFaqController.ts";
 
 const router = express.Router();
 
@@ -15,8 +15,8 @@ const validateId = (req: express.Request, res: express.Response, next: express.N
 };
 
 // 💡 authenticate, requiredAdmin을 싹 빼고 가볍게 연결합니다.
-router.post('/create', validate(createFaqSchema as any), adminFaqController.createFaq);
-router.put('/:faqId', validateId, validate(updateFaqSchema as any), adminFaqController.updateFaq);
+router.post('/create', validate(faqSchema), adminFaqController.createFaq);
+router.put('/:faqId', validateId, validate(faqSchema), adminFaqController.updateFaq);
 router.delete('/:id', validateId, adminFaqController.deleteFaq as any);
 
 export default router;

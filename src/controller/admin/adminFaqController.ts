@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import faqService from "../service/faqService";
+import faqService from "../../service/faqService.ts";
 
 export const createFaq = async (req: Request, res: Response): Promise<void> => {
     try {
