@@ -25,6 +25,13 @@ const createWeightLog = async (req: AuthRequest, res: Response) => {
                 });
                 return;
             }
+            // 💡 409 Conflict 에러 처리 추가
+            if (error.message === "ALREADY_EXISTS_WEIGHTLOG") {
+                res.status(409).json({
+                    message: "이미 해당 날짜에 기록된 몸무게가 있습니다.",
+                });
+                return;
+            }
         }
         console.log(error);
         res.status(500).json({ message: "몸무게 기록 생성 중 서버 에러가 발생했습니다." });
@@ -34,6 +41,7 @@ const createWeightLog = async (req: AuthRequest, res: Response) => {
 // 2. 특정 반려동물의 전체 몸무게 기록 조회
 const getWeightLogsByPetId = async (req: AuthRequest<{ petId: string }>, res: Response) => {
     try {
+        // ... 기존 코드와 동일 ...
         if (!req.user) {
             res.status(401).json({ message: "인증되지 않은 사용자입니다." });
             return;
@@ -64,6 +72,7 @@ const getWeightLogsByPetId = async (req: AuthRequest<{ petId: string }>, res: Re
 
 // 3. 특정 몸무게 기록 상세 조회
 const getWeightRecordById = async (req: AuthRequest<{ id: string }>, res: Response) => {
+    // ... 기존 코드와 동일 ...
     try {
         if (!req.user) {
             res.status(401).json({ message: "인증되지 않은 사용자입니다." });
@@ -114,6 +123,13 @@ const updateWeightLog = async (req: AuthRequest<{ id: string }>, res: Response) 
                 res.status(404).json({ message: "기록을 찾을 수 없거나 접근 권한이 없습니다." });
                 return;
             }
+            // 💡 409 Conflict 에러 처리 추가 (수정 시에도 다른 날짜와 충돌날 수 있음)
+            if (error.message === "ALREADY_EXISTS_WEIGHTLOG") {
+                res.status(409).json({
+                    message: "이미 해당 날짜에 기록된 몸무게가 있습니다.",
+                });
+                return;
+            }
         }
         console.log(error);
         res.status(500).json({ message: "몸무게 기록 수정 중 서버 에러가 발생했습니다." });
@@ -122,6 +138,7 @@ const updateWeightLog = async (req: AuthRequest<{ id: string }>, res: Response) 
 
 // 5. 몸무게 기록 삭제
 const deleteWeightLog = async (req: AuthRequest<{ id: string }>, res: Response) => {
+    // ... 기존 코드와 동일 ...
     try {
         if (!req.user) {
             res.status(401).json({ message: "인증되지 않은 사용자입니다." });
@@ -131,7 +148,6 @@ const deleteWeightLog = async (req: AuthRequest<{ id: string }>, res: Response) 
         const loginUserId = req.user.id;
         const id = Number(req.params.id);
 
-        //  [여기만 추가!] 라우터의 validate 미들웨어를 빼는 대신, 여기서 안전하게 ID가 숫자인지 검증합니다.
         if (isNaN(id) || id <= 0) {
             res.status(400).json({ message: "잘못된 입력값입니다. 올바른 ID 형식이 아닙니다." });
             return;
@@ -156,6 +172,7 @@ const deleteWeightLog = async (req: AuthRequest<{ id: string }>, res: Response) 
 
 // 6. 몸무게 통계 데이터 조회
 const getWeightLogStats = async (req: AuthRequest<{ petId: string }>, res: Response) => {
+    // ... 기존 코드와 동일 ...
     try {
         const petIdStr = req.params.petId;
         const period = req.query.period as "daily" | "weekly" | "monthly";
@@ -166,11 +183,9 @@ const getWeightLogStats = async (req: AuthRequest<{ petId: string }>, res: Respo
             return;
         }
 
-        // 이제 안전하게 인증된 유저 정보를 꺼내 씁니다.
         const loginUserId = req.user.id;
         const petId = parseInt(petIdStr, 10);
 
-        // 서비스 함수로 데이터를 토스합니다.
         const result = await weightLogService.getWeightLogStats(loginUserId, petId, {
             period,
             baseDate,

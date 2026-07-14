@@ -14,19 +14,9 @@ const checkPetOwnership = async (userId: number, petId: number) => {
     }
 };
 
-// 1. 생성
+// 1. 생성 (중복 체크 삭제 🚀)
 const createWaterLog = async (userId: number, data: CreateWaterLogInputType) => {
     await checkPetOwnership(userId, data.petId);
-
-    const targetDate = new Date(data.recordDate);
-
-    const existingLog = await prisma.waterLog.findFirst({
-        where: { petId: data.petId, recordDate: targetDate },
-    });
-
-    if (existingLog) {
-        throw new Error("ALREADY_EXISTS_WATERLOG");
-    }
 
     const input = {
         ...data,
@@ -63,22 +53,9 @@ const getWaterLogById = async (userId: number, id: number) => {
     return log;
 };
 
-// 4. 수정
+// 4. 수정 (중복 체크 삭제 🚀)
 const updateWaterLog = async (userId: number, id: number, data: UpdateWaterLogInputType) => {
-    const existingLog = await getWaterLogById(userId, id);
-    const targetDate = new Date(data.recordDate);
-
-    const duplicateLog = await prisma.waterLog.findFirst({
-        where: {
-            petId: existingLog.petId,
-            recordDate: targetDate,
-            id: { not: id},
-        }
-    })
-
-    if (duplicateLog) {
-        throw new Error("ALREADY_EXISTS_WATERLOG");
-    }
+    await getWaterLogById(userId, id); // 권한 및 존재 여부만 체크
 
     const input = {
         ...data,
@@ -102,6 +79,7 @@ const deleteWaterLog = async (userId: number, id: number) => {
     });
 };
 
+// 6. 통계 (누적 계산 로직 유지)
 const getWaterLogStats = async (
     userId: number,
     petId: number,
@@ -112,9 +90,8 @@ const getWaterLogStats = async (
     const { period, baseDate } = query;
     const targetDate = new Date(baseDate);
     let startDate = new Date(targetDate);
-    let endDate = new Date(targetDate); // 👈 월말 조회를 위한 종료일 변수 추가
+    let endDate = new Date(targetDate);
 
-    // 1. 기간 분기 및 정밀한 날짜 범위 세팅
     if (period === "daily") {
         startDate.setDate(targetDate.getDate() - 6);
     } else if (period === "weekly") {
@@ -124,11 +101,9 @@ const getWaterLogStats = async (
         startDate.setDate(1);
         startDate.setHours(0, 0, 0, 0);
 
-        // targetDate가 속한 달의 마지막 날짜의 밤 11시 59분으로 설정
         endDate = new Date(targetDate.getFullYear(), targetDate.getMonth() + 1, 0, 23, 59, 59);
     }
 
-    // 2. 프리즈마 범위 조회 (endDate 적용)
     const logs = await prisma.waterLog.findMany({
         where: {
             petId,
@@ -150,15 +125,15 @@ const getWaterLogStats = async (
         if (period === "daily") {
             key = dateObj.toISOString().split("T")[0] ?? "";
         } else if (period === "weekly") {
-            // 💡 [해결] 해당 날짜가 속한 주의 월요일 날짜를 찾아서 그룹화 키로 사용합니다.
-            const day = dateObj.getDay(); // 0(일) ~ 6(토)
-            const diff = dateObj.getDate() - day + (day === 0 ? -6 : 1); // 월요일로 맞춤
+            const day = dateObj.getDay();
+            const diff = dateObj.getDate() - day + (day === 0 ? -6 : 1);
             const monday = new Date(dateObj.setDate(diff));
             key = monday.toISOString().split("T")[0] ?? "";
         } else if (period === "monthly") {
             key = `${dateObj.getFullYear()}-${String(dateObj.getMonth() + 1).padStart(2, "0")}`;
         }
 
+        // 💡 여기가 핵심! 중복 등록된 데이터들이 여기서 하나의 키(날짜)에 합산(누적)됩니다.
         statsMap[key] = (statsMap[key] || 0) + log.amount;
     });
 

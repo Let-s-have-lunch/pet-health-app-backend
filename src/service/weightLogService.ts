@@ -14,14 +14,35 @@ const checkPetOwnership = async (userId: number, petId: number) => {
     }
 };
 
-// 1. 생성
+// 1. 생성 (💡 중복 방지 로직 추가)
 const createWeightLog = async (userId: number, data: CreateWeightLogInputType) => {
     await checkPetOwnership(userId, data.petId);
 
+    const targetDate = new Date(data.recordDate);
+
+    // 하루 범위(00:00:00 ~ 23:59:59) 설정
+    const startOfDay = new Date(targetDate.getFullYear(), targetDate.getMonth(), targetDate.getDate(), 0, 0, 0);
+    const endOfDay = new Date(targetDate.getFullYear(), targetDate.getMonth(), targetDate.getDate(), 23, 59, 59);
+
+    const existingLog = await prisma.weightLog.findFirst({
+        where: {
+            petId: data.petId,
+            deletedAt: null,
+            recordDate: {
+                gte: startOfDay,
+                lte: endOfDay,
+            }
+        },
+    });
+
+    if (existingLog) {
+        throw new Error("ALREADY_EXISTS_WEIGHTLOG");
+    }
+
     const input = {
         ...data,
-        recordDate: new Date(data.recordDate),
-        memo: data.memo ?? null, //  undefined를 null로 가공
+        recordDate: targetDate,
+        memo: data.memo ?? null, // undefined를 null로 가공
     };
 
     return prisma.weightLog.create({
@@ -53,13 +74,34 @@ const getWeightRecordById = async (userId: number, id: number) => {
     return log;
 };
 
-// 4. 수정
+// 4. 수정 (💡 중복 방지 로직 추가)
 const updateWeightLog = async (userId: number, id: number, data: UpdateWeightLogInputType) => {
-    await getWeightRecordById(userId, id);
+    const existingLog = await getWeightRecordById(userId, id);
+
+    const targetDate = new Date(data.recordDate);
+    const startOfDay = new Date(targetDate.getFullYear(), targetDate.getMonth(), targetDate.getDate(), 0, 0, 0);
+    const endOfDay = new Date(targetDate.getFullYear(), targetDate.getMonth(), targetDate.getDate(), 23, 59, 59);
+
+    // 나 자신(id)은 제외하고 다른 중복 기록이 있는지 검사
+    const duplicateLog = await prisma.weightLog.findFirst({
+        where: {
+            petId: existingLog.petId,
+            deletedAt: null,
+            recordDate: {
+                gte: startOfDay,
+                lte: endOfDay,
+            },
+            id: { not: id },
+        }
+    });
+
+    if (duplicateLog) {
+        throw new Error("ALREADY_EXISTS_WEIGHTLOG");
+    }
 
     const input = {
         ...data,
-        recordDate: new Date(data.recordDate),
+        recordDate: targetDate,
         memo: data.memo ?? null,
     };
 
@@ -84,15 +126,14 @@ const getWeightLogStats = async (
     petId: number,
     query: { period: "daily" | "weekly" | "monthly"; baseDate: string },
 ) => {
+    // ... 기존 통계 로직과 100% 동일하므로 생략하지 않고 그대로 포함합니다.
     const { period, baseDate } = query;
 
-    // 1. 소유권 검증
     await checkPetOwnership(userId, petId);
 
     const targetDate = new Date(baseDate);
     const startDate = new Date(targetDate);
 
-    // 2. 통계 기간 분기 처리 (💡 if-else 대신 switch 문으로 완벽하게 위장!)
     switch (period) {
         case "daily":
             startDate.setDate(targetDate.getDate() - 6);
@@ -106,7 +147,6 @@ const getWeightLogStats = async (
             break;
     }
 
-    // 3. 프리즈마 범위 조회
     const logs = await prisma.weightLog.findMany({
         where: {
             petId,
@@ -119,7 +159,6 @@ const getWeightLogStats = async (
         orderBy: { recordDate: "asc" },
     });
 
-    // 4. 평균 몸무게 집계 가공
     const sumMap: { [key: string]: number } = {};
     const countMap: { [key: string]: number } = {};
 
@@ -137,7 +176,6 @@ const getWeightLogStats = async (
         countMap[key] = (countMap[key] || 0) + 1;
     });
 
-    // 5. 객체를 배열 구조로 변환
     const chartData = Object.keys(sumMap).map(key => {
         const total = sumMap[key] ?? 0;
         const count = countMap[key] ?? 1;

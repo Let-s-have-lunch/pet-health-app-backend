@@ -24,9 +24,6 @@ const createWaterLog = async (req: AuthRequest, res: Response) => {
                     message: "해당 반려동물에 접근할 권한이 없거나 존재하지 않습니다.",
                 });
                 return;
-            } else if (error.message === "ALREADY_EXISTS_WATERLOG") {
-                res.status(409).json({ message: "이미 해당 날짜에 작성된 기록이 있습니다." });
-                return;
             }
         }
         console.log(error);
@@ -116,9 +113,6 @@ const updateWaterLog = async (req: AuthRequest<{ id: string }>, res: Response) =
             if (error.message === "WATER_LOG_NOT_FOUND_OR_FORBIDDEN") {
                 res.status(404).json({ message: "기록을 찾을 수 없거나 접근 권한이 없습니다." });
                 return;
-            } else if (error.message === "ALREADY_EXISTS_WATERLOG") {
-                res.status(409).json({ message: "이미 해당일에 작성된 기록이 있습니다." });
-                return;
             }
         }
         console.log(error);
@@ -154,7 +148,7 @@ const deleteWaterLog = async (req: AuthRequest<{ id: string }>, res: Response) =
     }
 };
 
-// 6. 음수량 통계 데이터 조회 (초록줄 방지 소문자 카멜케이스)
+// 6. 음수량 통계 데이터 조회
 const getWaterLogStats = async (req: AuthRequest<{ petId: string }>, res: Response) => {
     try {
         if (!req.user) {
@@ -165,11 +159,9 @@ const getWaterLogStats = async (req: AuthRequest<{ petId: string }>, res: Respon
         const loginUserId = req.user.id;
         const petId = parseInt(req.params.petId, 10);
 
-        // 주소창(?period=daily&baseDate=2026-07-03)에서 꺼내옵니다.
         const period = req.query.period as "daily" | "weekly" | "monthly";
         const baseDate = req.query.baseDate as string;
 
-        // 서비스로 토스해서 가공된 차트 데이터를 받아옵니다.
         const result = await waterLogService.getWaterLogStats(loginUserId, petId, {
             period,
             baseDate,

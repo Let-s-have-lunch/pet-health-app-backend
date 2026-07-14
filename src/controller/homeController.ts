@@ -2,13 +2,13 @@ import { Request, Response } from "express";
 import homeService from "../service/homeService.ts";
 
 /**
-  [GET] 메인 홈 화면 대시보드 데이터 조회
+ * [GET] 메인 홈 화면 대시보드 데이터 조회
  * Query: petId, date
  */
 export const getHomeDashboard = async (req: Request, res: Response) => {
     try {
         const petId = parseInt(String(req.query.petId), 10);
-        const dateStr = String(req.query.date); // 예: "2026-07-01"
+        const dateStr = String(req.query.date);
 
         if (!petId || !dateStr || dateStr === "undefined") {
             return res.status(400).json({
@@ -17,7 +17,7 @@ export const getHomeDashboard = async (req: Request, res: Response) => {
             });
         }
 
-        // 💡 homeService에서 Promise.all 함수를 호출합니다!
+        // 💡 하드코딩 데이터를 지우고, 방금 만든 완벽한 서비스를 호출합니다!
         const dashboardData = await homeService.getPetDashboardWithPromiseAll(petId, dateStr);
 
         return res.status(200).json({
