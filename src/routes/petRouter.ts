@@ -10,6 +10,6 @@ router.get("/list/:petId", authenticate, petController.getPet);
 router.get("/list", authenticate, petController.getMyPets);
 router.post("/create", authenticate, validate(petCreateSchema), petController.createPet);
 router.patch("/update/:petId", authenticate, validate(petCreateSchema), petController.updatePet);
-router.delete("/:petId", authenticate, petController.deletePet);
+router.delete("/delete/:petId", authenticate, petController.deletePet);
 
 export default router;
