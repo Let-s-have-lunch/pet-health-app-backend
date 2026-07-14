@@ -16,7 +16,7 @@ export const petCreateSchema = z.object({
         .or(z.literal("")),
     registrationNumber: z.string().optional(),
     gender: z.enum(PetGender, "성별을 선택해주세요"),
-    neutered: z.boolean(),
+    neutered: z.coerce.boolean(),
 });
 
 export type PetCreateInputType = z.infer<typeof petCreateSchema>;
