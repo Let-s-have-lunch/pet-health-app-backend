@@ -1,13 +1,12 @@
 import { CreateTodoInputType } from "../schemas/user/todo/createTodoSchema.ts";
 import prisma from "../config/prisma.ts";
 
-const getTodoList = async (userId: number, date: Date ) => {
+const getTodoList = async (userId: number, date: Date) => {
     const startOfDay = new Date(date);
     startOfDay.setHours(0, 0, 0, 0);
 
     const nextDay = new Date(startOfDay);
     nextDay.setDate(nextDay.getDate() + 1);
-
 
     return prisma.todo.findMany({
         where: {
@@ -20,6 +19,29 @@ const getTodoList = async (userId: number, date: Date ) => {
         },
         orderBy: {
             id: "asc",
+        },
+    });
+};
+
+const getTodoListByRange = async (userId: number, startDate: Date, endDate: Date) => {
+    const start = new Date(startDate);
+    start.setHours(0, 0, 0, 0);
+
+    const nextDayOfEnd = new Date(endDate);
+    nextDayOfEnd.setHours(0, 0, 0, 0);
+    nextDayOfEnd.setDate(nextDayOfEnd.getDate() + 1);
+
+    return prisma.todo.findMany({
+        where: {
+            userId,
+            date: {
+                gte: start,
+                lt: nextDayOfEnd,
+            },
+            deletedAt: null,
+        },
+        orderBy: {
+            date: "asc",
         },
     });
 };
@@ -86,6 +108,7 @@ const deleteTodo = async (id: number, userId: number) => {
 
 export default {
     getTodoList,
+    getTodoListByRange,
     createTodo,
     updateTodo,
     deleteTodo,

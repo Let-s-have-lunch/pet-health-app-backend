@@ -8,6 +8,7 @@ const router = Router();
 
 router.post("/create", authenticate, validate(createDiarySchema),diaryController.createDiary);
 router.get("/date", authenticate, diaryController.getDiaryList);
+router.get("/range", authenticate, diaryController.getDiaryListByRange);
 router.patch("/:diaryId", authenticate, validate(createDiarySchema), diaryController.updateDiary);
 router.delete("/:diaryId", authenticate, diaryController.deleteDiary);
 

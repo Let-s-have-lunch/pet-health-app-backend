@@ -6,8 +6,9 @@ import todoController from "../controller/todoController.ts";
 
 const router = Router();
 
-router.post("/craete", authenticate, validate(createTodoSchema),todoController.createTodo);
-router.get("/list",authenticate,todoController.getTodoList);
+router.post("/create", authenticate, validate(createTodoSchema),todoController.createTodo);
+router.get("/list", authenticate, todoController.getTodoList);
+router.get("/range", authenticate, todoController.getTodoListByRange);
 router.patch("/:id",authenticate,validate(createTodoSchema),todoController.updateTodo);
 router.delete("/:id",authenticate,todoController.deleteTodo);
 
