@@ -75,18 +75,22 @@ const createPet = async (req: AuthRequest, res: Response) => {
             species,
             breed,
             name,
-            profileImage,
             birthdate,
             registrationNumber,
             gender,
-            neutered,
         } = req.body;
+
+        const neutered = req.body.neutered === "true";
+        let profileImage: string | null = null;
+        if (req.file) {
+            profileImage = `/uploads/${req.file.filename}`;
+        }
 
         const petData: PetCreateInput = {
             species,
             breed: breed ?? null,
             name,
-            profileImage: profileImage ?? null,
+            profileImage,
             birthdate: birthdate ? new Date(birthdate) : null,
             registrationNumber: registrationNumber ?? null,
             gender,
@@ -122,12 +126,18 @@ const updatePet = async (req: AuthRequest<{ petId: string }>, res: Response) => 
         }
 
         const userId = req.user.id;
-        const input: PetUpdateInputType = req.body;
+        const input: PetUpdateInputType = { ...req.body, neutered: req.body.neutered === "true" };
+        if (req.file) {
+            input.profileImage = `/uploads/${req.file.filename}`;
+        }
 
-        console.log("update input");
-        console.log(input);
+        console.log("===== UPDATE =====");
+        console.log("req.file =", req.file);
+        console.log("req.body.profileImage =", req.body.profileImage);
+        console.log("req.body =", req.body);
 
         const result = await petService.updatePet(userId, petId, input);
+
 
         res.status(200).json({
             message: "반려동물 정보가 성공적으로 수정되었습니다.",

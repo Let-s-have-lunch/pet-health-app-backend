@@ -64,11 +64,11 @@ const updatePet = async (userId: number, petId: number, input: PetUpdateInputTyp
         data: {
                 name: input.name,
                 species: input.species,
-                breed: input.breed,
+                breed: input.breed ?? null,
                 gender: input.gender,
                 neutered: input.neutered,
-                registrationNumber: input.registrationNumber,
-                profileImage: input.profileImage,
+                registrationNumber: input.registrationNumber ?? null,
+                profileImage: input.profileImage ?? null,
 
                 birthdate: input.birthdate ? new Date(input.birthdate) : null,
         },

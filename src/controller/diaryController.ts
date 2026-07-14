@@ -49,7 +49,6 @@ const getDiaryList = async (req: AuthRequest, res: Response) => {
 
         if (!req.user) {
             return res.status(401).json({ message: "인증되지 않은 사용자입니다. " });
-
         }
 
         const userId = req.user.id;
@@ -65,6 +64,53 @@ const getDiaryList = async (req: AuthRequest, res: Response) => {
         res.status(500).json({
             message: "서버 에러가 발생했습니다.",
         });
+    }
+};
+
+const getDiaryListByRange = async (req: AuthRequest, res: Response) => {
+    try {
+        const { startDate, endDate } = req.query;
+
+        if (!startDate || !endDate) {
+            return res.status(400).json({
+                message: "시작일(startDate)과 종료일(endDate)을 모두 입력해주세요.",
+            });
+        }
+
+        if (typeof startDate !== "string" || typeof endDate !== "string") {
+            return res.status(400).json({
+                message: "잘못된 날짜 형식입니다.",
+            });
+        }
+
+        const parsedStartDate = new Date(startDate);
+        const parsedEndDate = new Date(endDate);
+
+        if (isNaN(parsedStartDate.getTime()) || isNaN(parsedEndDate.getTime())) {
+            return res.status(400).json({
+                message: "유효하지 않은 날짜입니다.",
+            });
+        }
+
+        if (!req.user) {
+            return res.status(401).json({ message: "인증되지 않은 사용자입니다." });
+        }
+
+        const userId = req.user.id;
+
+        const diaryList = await diaryService.getDiaryListByRange(
+            userId,
+            parsedStartDate,
+            parsedEndDate,
+        );
+
+        res.status(200).json({
+            message: "기간별 다이어리를 성공적으로 불러왔습니다.",
+            data: diaryList,
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: "기간별 다이어리 조회 중 서버 에러가 발생했습니다." });
     }
 };
 
@@ -138,6 +184,7 @@ const deleteDiary = async (req: AuthRequest<{ diaryId: string }>, res: Response)
 export default {
     createDiary,
     getDiaryList,
+    getDiaryListByRange,
     updateDiary,
     deleteDiary,
 };
