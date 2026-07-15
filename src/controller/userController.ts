@@ -7,6 +7,7 @@ import { LoginInputType } from "../schemas/user/auth/login.ts";
 import { UpdateUserInputType } from "../schemas/user/auth/updateUserSchema.ts";
 import { UpdatePasswordInputType } from "../schemas/user/auth/updatePasswordSchema.ts";
 import { WithdrawUserInputType } from "../schemas/user/auth/withdrawUser.ts";
+import todoService from "../service/todoService.ts";
 
 const getMe = async (req: AuthRequest, res: Response) => {
     if (!req.user) {
@@ -178,5 +179,7 @@ const withdrawUser = async (req: AuthRequest, res: Response) => {
         res.status(500).json({ message: "회원 탈퇴 중 서버 에러가 발생했습니다." });
     }
 };
+
+
 
 export default { getMe, createUser, login, updateUser, updatePassword, withdrawUser };

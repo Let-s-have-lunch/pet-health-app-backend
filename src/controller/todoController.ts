@@ -180,10 +180,47 @@ const deleteTodo = async (req: AuthRequest<{ id: string }>, res: Response) => {
     }
 };
 
+const toggleTodo = async (req: AuthRequest<{ id: string }>, res: Response) => {
+    try {
+        if (!req.user) {
+            return res.status(401).json({ message: "인증되지 않은 사용자입니다." });
+        }
+
+        const todoId = Number(req.params.id);
+        if (isNaN(todoId)) {
+            return res.status(400).json({ message: "유효하지 않은 ID 입니다." });
+        }
+
+        const { completed } = req.body;
+        // 클라이언트에서 boolean 타입으로 잘 보냈는지 확인
+        if (typeof completed !== "boolean") {
+            return res.status(400).json({ message: "완료 상태(completed)가 유효하지 않습니다." });
+        }
+
+        const userId = req.user.id;
+        const result = await todoService.toggleTodo(userId, todoId, completed);
+
+        if (!result) {
+            return res.status(404).json({
+                message: "할 일을 찾을 수 없거나 권한이 없습니다.",
+            });
+        }
+
+        res.status(200).json({
+            message: "할 일 완료 상태가 성공적으로 변경되었습니다.",
+            data: result,
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: "서버 에러가 발생했습니다." });
+    }
+};
+
 export default {
     getTodoList,
     getTodoListByRange,
     createTodo,
     updateTodo,
     deleteTodo,
+    toggleTodo
 };

@@ -95,14 +95,38 @@ const deleteTodo = async (id: number, userId: number) => {
         throw new Error("NOT_FOUND_TODO");
     }
 
-
     return prisma.todo.update({
         where: {
             id,
         },
         data: {
             deletedAt: new Date(),
-        }
+        },
+    });
+};
+
+const toggleTodo = async (userId: number, todoId: number, isCompleted: boolean) => {
+    // 1. 해당 할 일이 존재하는지, 그리고 이 유저의 것인지 먼저 확인
+    const todo = await prisma.todo.findFirst({
+        where: {
+            id: todoId,
+            userId,
+            deletedAt: null, // 삭제된 할 일은 토글 불가
+        },
+    });
+
+    if (!todo) {
+        return null;
+    }
+
+    // 2. 상태 업데이트
+    return prisma.todo.update({
+        where: {
+            id: todoId,
+        },
+        data: {
+            isCompleted, // 프론트에서 넘어온 boolean 값으로 업데이트
+        },
     });
 };
 
@@ -112,4 +136,5 @@ export default {
     createTodo,
     updateTodo,
     deleteTodo,
+    toggleTodo
 };

@@ -11,6 +11,7 @@ router.get("/list", authenticate, todoController.getTodoList);
 router.get("/range", authenticate, todoController.getTodoListByRange);
 router.patch("/:id",authenticate,validate(createTodoSchema),todoController.updateTodo);
 router.delete("/:id",authenticate,todoController.deleteTodo);
+router.patch("/:id/toggle", authenticate, todoController.toggleTodo);
 
 export default router;
 
