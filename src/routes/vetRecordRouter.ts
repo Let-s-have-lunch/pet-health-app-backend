@@ -10,7 +10,6 @@ import {
 import { upload } from "../middlewares/multer.ts";
 const router = Router();
 
-// Todo
 
 // 1. 병원 기록 생성
 router.post(
@@ -22,14 +21,13 @@ router.post(
 );
 
 // 2. 특정 반려동물의 전체 병원 기록 조회
-// (URL 파라미터 :petId에 대한 별도 스키마가 없다면 인증 미들웨어만 유지합니다)
 router.get("/pet/:petId", authenticate, vetRecordController.getVetRecordsByPetId);
 
 // 3. 특정 병원 기록 상세 조회
 router.get(
     "/:id",
     authenticate,
-    validate(getVetRecordSchema), // 👈 ID 검증 스키마 적용[cite: 3]
+    validate(getVetRecordSchema),
     vetRecordController.getVetRecordById,
 );
 
