@@ -10,6 +10,8 @@ import {
 import { upload } from "../middlewares/multer.ts";
 const router = Router();
 
+// Todo
+
 // 1. 병원 기록 생성
 router.post(
     "/",
