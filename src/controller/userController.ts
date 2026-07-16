@@ -7,7 +7,6 @@ import { LoginInputType } from "../schemas/user/auth/login.ts";
 import { UpdateUserInputType } from "../schemas/user/auth/updateUserSchema.ts";
 import { UpdatePasswordInputType } from "../schemas/user/auth/updatePasswordSchema.ts";
 import { WithdrawUserInputType } from "../schemas/user/auth/withdrawUser.ts";
-import todoService from "../service/todoService.ts";
 
 const getMe = async (req: AuthRequest, res: Response) => {
     if (!req.user) {
@@ -68,7 +67,7 @@ const login = async (req: Request, res: Response) => {
     } catch (error) {
         if (error instanceof Error) {
             if (error.message === "INVALID_CREDENTIALS") {
-                res.status(401).json({ message: "아이디 또는 비밀번호가 일치하지 않습니다." });
+                res.status(400).json({ message: "아이디 또는 비밀번호가 일치하지 않습니다." });
                 return;
             }
         }
