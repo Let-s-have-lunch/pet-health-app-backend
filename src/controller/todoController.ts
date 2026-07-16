@@ -191,26 +191,18 @@ const toggleTodo = async (req: AuthRequest<{ id: string }>, res: Response) => {
             return res.status(400).json({ message: "유효하지 않은 ID 입니다." });
         }
 
-        const { completed } = req.body;
-        // 클라이언트에서 boolean 타입으로 잘 보냈는지 확인
-        if (typeof completed !== "boolean") {
-            return res.status(400).json({ message: "완료 상태(completed)가 유효하지 않습니다." });
-        }
-
         const userId = req.user.id;
-        const result = await todoService.toggleTodo(userId, todoId, completed);
-
-        if (!result) {
-            return res.status(404).json({
-                message: "할 일을 찾을 수 없거나 권한이 없습니다.",
-            });
-        }
+        const result = await todoService.toggleTodo(userId, todoId);
 
         res.status(200).json({
             message: "할 일 완료 상태가 성공적으로 변경되었습니다.",
             data: result,
         });
     } catch (error) {
+        if (error instanceof Error && error.message === "NOT_FOUND_TODO") {
+            res.status(404).json({ message: "존재하지 않는 todo 입니다."})
+            return;
+        }
         console.error(error);
         res.status(500).json({ message: "서버 에러가 발생했습니다." });
     }

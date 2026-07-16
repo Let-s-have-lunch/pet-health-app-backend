@@ -105,7 +105,7 @@ const deleteTodo = async (id: number, userId: number) => {
     });
 };
 
-const toggleTodo = async (userId: number, todoId: number, isCompleted: boolean) => {
+const toggleTodo = async (userId: number, todoId: number) => {
     // 1. 해당 할 일이 존재하는지, 그리고 이 유저의 것인지 먼저 확인
     const todo = await prisma.todo.findFirst({
         where: {
@@ -116,8 +116,10 @@ const toggleTodo = async (userId: number, todoId: number, isCompleted: boolean) 
     });
 
     if (!todo) {
-        return null;
+        throw new Error("NOT_FOUND_TODO");
     }
+
+    const newStatus = !todo.isCompleted;
 
     // 2. 상태 업데이트
     return prisma.todo.update({
@@ -125,7 +127,7 @@ const toggleTodo = async (userId: number, todoId: number, isCompleted: boolean) 
             id: todoId,
         },
         data: {
-            isCompleted, // 프론트에서 넘어온 boolean 값으로 업데이트
+            isCompleted: newStatus
         },
     });
 };
