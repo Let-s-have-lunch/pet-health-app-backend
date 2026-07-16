@@ -15,7 +15,7 @@ const createDiary = async (req: AuthRequest, res: Response) => {
         const diaryData: CreateDiaryInputType = {
             ...req.body,
             date: new Date(req.body.date),
-            diaryImage: req.file ? `/uploads/${req.file.filename}` : undefined,
+            diaryImage: req.file ? `/uploads/${req.file.filename}` : req.body.diaryImage,
         };
 
         const newDiary = await diaryService.createDiary(diaryData, userId);
@@ -23,6 +23,7 @@ const createDiary = async (req: AuthRequest, res: Response) => {
             message: "다이어리가 작성되었습니다.",
             data: newDiary,
         });
+
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: "다이어리 작성 중 서버 에러가 발생되었습니다." });
