@@ -2,25 +2,70 @@ import { Response } from "express";
 import { AuthRequest } from "../middlewares/auth.ts";
 import { CreateDiaryInputType } from "../schemas/user/diary/createDiarySchema.ts";
 import diaryService from "../service/diaryService.ts";
+import { UpdateDiaryInputType } from "../schemas/user/diary/updateDiarySchema.ts";
 
 const createDiary = async (req: AuthRequest, res: Response) => {
     try {
-        if(!req.user) {
+        if (!req.user) {
             return res.status(401).json({ message: "로그인이 필요한 서비스입니다." });
         }
 
-       const userId = req.user.id;
+        const userId = req.user.id;
 
-        const diaryData: CreateDiaryInputType = req.body;
+        const diaryData: CreateDiaryInputType = {
+            ...req.body,
+            date: new Date(req.body.date),
+            diaryImage: req.file ? `/uploads/${req.file.filename}` : req.body.diaryImage,
+        };
 
         const newDiary = await diaryService.createDiary(diaryData, userId);
         res.status(201).json({
             message: "다이어리가 작성되었습니다.",
-            data: newDiary
+            data: newDiary,
         });
+
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: "다이어리 작성 중 서버 에러가 발생되었습니다." });
+    }
+};
+
+const getDiary = async (req: AuthRequest<{ diaryId: string }>, res: Response) => {
+    try {
+        const diaryId = Number(req.params.diaryId);
+
+        if (isNaN(diaryId)) {
+            return res.status(400).json({
+                message: "유효하지 않은 다이어리 ID입니다.",
+            });
+        }
+
+        if (!req.user) {
+            return res.status(401).json({
+                message: "로그인이 필요한 서비스입니다.",
+            });
+        }
+
+        const userId = req.user.id;
+
+        const diary = await diaryService.getDiary(diaryId, userId);
+
+        if (!diary) {
+            return res.status(404).json({
+                message: "다이어리를 찾을 수 없습니다.",
+            });
+        }
+
+        return res.status(200).json({
+            message: "다이어리를 성공적으로 조회했습니다.",
+            data: diary,
+        });
+    } catch (error) {
+        console.error(error);
+
+        return res.status(500).json({
+            message: "다이어리 조회 중 서버 오류가 발생했습니다.",
+        });
     }
 };
 
@@ -118,8 +163,7 @@ const updateDiary = async (req: AuthRequest<{ diaryId: string }>, res: Response)
     try {
         const diaryId = Number(req.params.diaryId);
         if (isNaN(diaryId)) {
-           return res.status(400).json({ message: "유효하지 않은 다이어리 ID 입니다. " });
-
+            return res.status(400).json({ message: "유효하지 않은 다이어리 ID 입니다. " });
         }
 
         const user = req.user;
@@ -132,7 +176,11 @@ const updateDiary = async (req: AuthRequest<{ diaryId: string }>, res: Response)
 
         const userId = user.id;
 
-        const diaryData: CreateDiaryInputType = req.body;
+        const diaryData: UpdateDiaryInputType = {
+            ...req.body,
+            date: new Date(req.body.date),
+            diaryImage: req.file ? `/uploads/${req.file.filename}` : req.body.diaryImage,
+        };
 
         const updatedDiary = await diaryService.updateDiary(diaryId, userId, diaryData);
         if (!updatedDiary) {
@@ -183,6 +231,7 @@ const deleteDiary = async (req: AuthRequest<{ diaryId: string }>, res: Response)
 
 export default {
     createDiary,
+    getDiary,
     getDiaryList,
     getDiaryListByRange,
     updateDiary,
