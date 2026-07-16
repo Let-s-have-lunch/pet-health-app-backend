@@ -15,7 +15,7 @@ const createDiary = async (req: AuthRequest, res: Response) => {
         const diaryData: CreateDiaryInputType = {
             ...req.body,
             date: new Date(req.body.date),
-            diaryImage: req.file ? `/uploads/diary/${req.file.filename}` : undefined,
+            diaryImage: req.file ? `/uploads/${req.file.filename}` : undefined,
         };
 
         const newDiary = await diaryService.createDiary(diaryData, userId);
@@ -178,7 +178,7 @@ const updateDiary = async (req: AuthRequest<{ diaryId: string }>, res: Response)
         const diaryData: UpdateDiaryInputType = {
             ...req.body,
             date: new Date(req.body.date),
-            diaryImage: req.file ? `/uploads/diary/${req.file.filename}` : req.body.diaryImage,
+            diaryImage: req.file ? `/uploads/${req.file.filename}` : req.body.diaryImage,
         };
 
         const updatedDiary = await diaryService.updateDiary(diaryId, userId, diaryData);

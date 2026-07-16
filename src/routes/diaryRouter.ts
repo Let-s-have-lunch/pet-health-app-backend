@@ -12,7 +12,7 @@ router.post("/create", authenticate, upload.single("diaryImage"), diaryControlle
 router.get("/date", authenticate, diaryController.getDiaryList);
 router.get("/range", authenticate, diaryController.getDiaryListByRange);
 router.get("/:diaryId", authenticate, diaryController.getDiary);
-router.patch("/:diaryId", authenticate, validate(updateDiarySchema), diaryController.updateDiary);
+router.patch("/:diaryId", authenticate, upload.single("diaryImage"), diaryController.updateDiary);
 router.delete("/:diaryId", authenticate, diaryController.deleteDiary);
 
 export default router;
