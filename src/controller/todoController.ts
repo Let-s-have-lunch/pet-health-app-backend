@@ -1,7 +1,7 @@
 import { Response } from "express";
 import { AuthRequest } from "../middlewares/auth.ts";
 import todoService from "../service/todoService.ts";
-import { CreateTodoInputType } from "../schemas/user/todo/createTodoSchema.ts";
+import { TodoInputType } from "../schemas/user/todo/todoSchema.ts";
 
 const getTodoList = async (req: AuthRequest, res: Response) => {
     try {
@@ -100,7 +100,7 @@ const createTodo = async (req: AuthRequest, res: Response) => {
             return res.status(401).json({ message: "로그인이 필요한 서비스입니다." });
         }
         const userId = user.id;
-        const todoData: CreateTodoInputType = req.body;
+        const todoData: TodoInputType = req.body;
         const newTodo = await todoService.createTodo(todoData, userId);
         res.status(201).json({
             message: "할 일이 등록되었습니다.",
@@ -127,7 +127,7 @@ const updateTodo = async (req: AuthRequest<{ id: string }>, res: Response) => {
         }
 
         const userId = req.user.id;
-        const input: CreateTodoInputType = req.body;
+        const input: TodoInputType = req.body;
         const result = await todoService.updateTodo(userId, todoId, input);
 
         if (!result) {

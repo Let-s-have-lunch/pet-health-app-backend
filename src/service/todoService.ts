@@ -1,5 +1,5 @@
-import { CreateTodoInputType } from "../schemas/user/todo/createTodoSchema.ts";
 import prisma from "../config/prisma.ts";
+import { TodoInputType } from "../schemas/user/todo/todoSchema.ts";
 
 const getTodoList = async (userId: number, date: Date) => {
     const startOfDay = new Date(date);
@@ -46,20 +46,17 @@ const getTodoListByRange = async (userId: number, startDate: Date, endDate: Date
     });
 };
 
-const createTodo = async (todoData: CreateTodoInputType, userId: number) => {
+const createTodo = async (todoData: TodoInputType, userId: number) => {
     return prisma.todo.create({
         data: {
-            ...todoData,
-            user: {
-                connect: {
-                    id: userId,
-                },
-            },
+            title: todoData.title,
+            date: new Date(todoData.date), // 문자열을 명시적으로 Date로 변환
+            user: { connect: { id: userId } },
         },
     });
 };
 
-const updateTodo = async (userId: number, todoId: number, input: CreateTodoInputType) => {
+const updateTodo = async (userId: number, todoId: number, input: TodoInputType) => {
     const todo = await prisma.todo.findFirst({
         where: {
             id: todoId,
