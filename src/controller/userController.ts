@@ -7,7 +7,6 @@ import { LoginInputType } from "../schemas/user/auth/login.ts";
 import { UpdateUserInputType } from "../schemas/user/auth/updateUserSchema.ts";
 import { UpdatePasswordInputType } from "../schemas/user/auth/updatePasswordSchema.ts";
 import { WithdrawUserInputType } from "../schemas/user/auth/withdrawUser.ts";
-import todoService from "../service/todoService.ts";
 
 const getMe = async (req: AuthRequest, res: Response) => {
     if (!req.user) {
