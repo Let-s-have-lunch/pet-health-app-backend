@@ -1,5 +1,6 @@
 import { CreateDiaryInputType } from "../schemas/user/diary/createDiarySchema.ts";
 import prisma from "../config/prisma.ts";
+import { UpdateDiaryInputType } from "../schemas/user/diary/updateDiarySchema.ts";
 
 const createDiary = async (diaryData: CreateDiaryInputType, userId: number) => {
     return prisma.diary.create({
@@ -11,6 +12,16 @@ const createDiary = async (diaryData: CreateDiaryInputType, userId: number) => {
                     id: userId,
                 },
             },
+        },
+    });
+};
+
+const getDiary = async (diaryId: number, userId: number) => {
+    return prisma.diary.findFirst({
+        where: {
+            id: diaryId,
+            userId,
+            deletedAt: null,
         },
     });
 };
@@ -60,7 +71,7 @@ const getDiaryListByRange = async (userId: number, startDate: Date, endDate: Dat
     });
 };
 
-const updateDiary = async (diaryId: number, userId: number, diaryData: CreateDiaryInputType) => {
+const updateDiary = async (diaryId: number, userId: number, diaryData: UpdateDiaryInputType) => {
     const diary = await prisma.diary.findFirst({
         where: {
             id: diaryId,
@@ -107,6 +118,7 @@ const deleteDiary = async (diaryId: number, userId: number) => {
 
 export default {
     createDiary,
+    getDiary,
     getDiaryList,
     getDiaryListByRange,
     updateDiary,
