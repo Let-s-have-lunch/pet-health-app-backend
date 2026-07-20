@@ -2,7 +2,6 @@ import { Response } from "express";
 import { AuthRequest } from "../middlewares/auth.ts";
 import waterLogService from "../service/waterLogService.ts";
 
-// 1. 음수량 기록 생성
 const createWaterLog = async (req: AuthRequest, res: Response) => {
     try {
         if (!req.user) {
@@ -31,7 +30,6 @@ const createWaterLog = async (req: AuthRequest, res: Response) => {
     }
 };
 
-// 2. 특정 반려동물의 전체 음수량 기록 조회
 const getWaterLogsByPetId = async (req: AuthRequest<{ petId: string }>, res: Response) => {
     try {
         if (!req.user) {
@@ -62,7 +60,6 @@ const getWaterLogsByPetId = async (req: AuthRequest<{ petId: string }>, res: Res
     }
 };
 
-// 3. 특정 음수량 기록 상세 조회
 const getWaterLogById = async (req: AuthRequest<{ id: string }>, res: Response) => {
     try {
         if (!req.user) {
@@ -91,7 +88,6 @@ const getWaterLogById = async (req: AuthRequest<{ id: string }>, res: Response) 
     }
 };
 
-// 4. 음수량 기록 수정
 const updateWaterLog = async (req: AuthRequest<{ id: string }>, res: Response) => {
     try {
         if (!req.user) {
@@ -120,7 +116,6 @@ const updateWaterLog = async (req: AuthRequest<{ id: string }>, res: Response) =
     }
 };
 
-// 5. 음수량 기록 삭제
 const deleteWaterLog = async (req: AuthRequest<{ id: string }>, res: Response) => {
     try {
         if (!req.user) {
@@ -148,7 +143,6 @@ const deleteWaterLog = async (req: AuthRequest<{ id: string }>, res: Response) =
     }
 };
 
-// 6. 음수량 통계 데이터 조회
 const getWaterLogStats = async (req: AuthRequest<{ petId: string }>, res: Response) => {
     try {
         if (!req.user) {

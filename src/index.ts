@@ -42,7 +42,6 @@ app.use("/pet", petRouter);
 app.use("/diary", diaryRouter);
 app.use("/todo", todoRouter);
 
-// 로그 및 건강 기록 담당 라우터
 app.use("/walk-logs", walkLogRouter);
 app.use("/vet-records", vetRecordRouter);
 app.use("/weight-logs", weightLogRouter);

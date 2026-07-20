@@ -103,12 +103,11 @@ const deleteTodo = async (id: number, userId: number) => {
 };
 
 const toggleTodo = async (userId: number, todoId: number) => {
-    // 1. 해당 할 일이 존재하는지, 그리고 이 유저의 것인지 먼저 확인
     const todo = await prisma.todo.findFirst({
         where: {
             id: todoId,
             userId,
-            deletedAt: null, // 삭제된 할 일은 토글 불가
+            deletedAt: null,
         },
     });
 
@@ -118,7 +117,6 @@ const toggleTodo = async (userId: number, todoId: number) => {
 
     const newStatus = !todo.isCompleted;
 
-    // 2. 상태 업데이트
     return prisma.todo.update({
         where: {
             id: todoId,

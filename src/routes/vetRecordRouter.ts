@@ -11,7 +11,6 @@ import { upload } from "../middlewares/multer.ts";
 const router = Router();
 
 
-// 1. 병원 기록 생성
 router.post(
     "/",
     authenticate,
@@ -20,10 +19,8 @@ router.post(
     vetRecordController.createVetRecord,
 );
 
-// 2. 특정 반려동물의 전체 병원 기록 조회
 router.get("/pet/:petId", authenticate, vetRecordController.getVetRecordsByPetId);
 
-// 3. 특정 병원 기록 상세 조회
 router.get(
     "/:id",
     authenticate,
@@ -31,7 +28,6 @@ router.get(
     vetRecordController.getVetRecordById,
 );
 
-// 4. 병원 기록 수정
 router.put(
     "/:id",
     authenticate,
@@ -40,7 +36,6 @@ router.put(
     vetRecordController.updateVetRecord,
 );
 
-// 5. 병원 기록 삭제
 router.delete(
     "/:id",
     authenticate,

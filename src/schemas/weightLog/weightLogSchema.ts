@@ -1,6 +1,5 @@
 import { z } from "zod";
 
-// 1. Create 스키마[cite: 1]
 export const createWeightLogSchema = z.object({
     recordDate: z.string(),
     weight: z.number().positive(),
@@ -9,7 +8,6 @@ export const createWeightLogSchema = z.object({
 });
 export type CreateWeightLogInputType = z.infer<typeof createWeightLogSchema>;
 
-// 2. Update 스키마[cite: 4]
 export const updateWeightLogSchema = z.object({
     recordDate: z.string(),
     weight: z.number().positive(),
@@ -18,19 +16,11 @@ export const updateWeightLogSchema = z.object({
 });
 export type UpdateWeightLogInputType = z.infer<typeof updateWeightLogSchema>;
 
-// 3. Get 스키마[cite: 3]
 export const getWeightLogSchema = z.object({
     id: z.string(),
 });
 export type GetWeightLogInputType = z.infer<typeof getWeightLogSchema>;
 
-// 4. Delete 스키마[cite: 2]
-export const deleteWeightLogSchema = z.object({
-    id: z.string(),
-});
-export type DeleteWeightLogInputType = z.infer<typeof deleteWeightLogSchema>;
-
-// 5. 몸무게 통계 조회 스키마
 export const getWeightLogStatsSchema = z.object({
     period: z.enum(["daily", "weekly", "monthly"], {
         message: "period는 'daily', 'weekly', 'monthly' 중 하나여야 합니다."

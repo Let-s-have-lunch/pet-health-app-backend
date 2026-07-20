@@ -4,7 +4,6 @@ import {
     UpdateWeightLogInputType,
 } from "../schemas/weightLog/weightLogSchema.ts";
 
-// 반려동물 소유권 확인 헬퍼
 const checkPetOwnership = async (userId: number, petId: number) => {
     const pet = await prisma.pet.findFirst({
         where: { id: petId, userId, deletedAt: null },
@@ -14,13 +13,11 @@ const checkPetOwnership = async (userId: number, petId: number) => {
     }
 };
 
-// 1. 생성 (💡 중복 방지 로직 추가)
 const createWeightLog = async (userId: number, data: CreateWeightLogInputType) => {
     await checkPetOwnership(userId, data.petId);
 
     const targetDate = new Date(data.recordDate);
 
-    // 하루 범위(00:00:00 ~ 23:59:59) 설정
     const startOfDay = new Date(targetDate.getFullYear(), targetDate.getMonth(), targetDate.getDate(), 0, 0, 0);
     const endOfDay = new Date(targetDate.getFullYear(), targetDate.getMonth(), targetDate.getDate(), 23, 59, 59);
 
@@ -42,7 +39,7 @@ const createWeightLog = async (userId: number, data: CreateWeightLogInputType) =
     const input = {
         ...data,
         recordDate: targetDate,
-        memo: data.memo ?? null, // undefined를 null로 가공
+        memo: data.memo ?? null,
     };
 
     return prisma.weightLog.create({
@@ -50,7 +47,6 @@ const createWeightLog = async (userId: number, data: CreateWeightLogInputType) =
     });
 };
 
-// 2. 반려동물별 전체 조회
 const getWeightLogsByPetId = async (userId: number, petId: number) => {
     await checkPetOwnership(userId, petId);
 
@@ -60,7 +56,6 @@ const getWeightLogsByPetId = async (userId: number, petId: number) => {
     });
 };
 
-// 3. 단일 상세 조회
 const getWeightRecordById = async (userId: number, id: number) => {
     const log = await prisma.weightLog.findFirst({
         where: { id, deletedAt: null },
@@ -74,7 +69,6 @@ const getWeightRecordById = async (userId: number, id: number) => {
     return log;
 };
 
-// 4. 수정 (💡 중복 방지 로직 추가)
 const updateWeightLog = async (userId: number, id: number, data: UpdateWeightLogInputType) => {
     const existingLog = await getWeightRecordById(userId, id);
 
@@ -82,7 +76,6 @@ const updateWeightLog = async (userId: number, id: number, data: UpdateWeightLog
     const startOfDay = new Date(targetDate.getFullYear(), targetDate.getMonth(), targetDate.getDate(), 0, 0, 0);
     const endOfDay = new Date(targetDate.getFullYear(), targetDate.getMonth(), targetDate.getDate(), 23, 59, 59);
 
-    // 나 자신(id)은 제외하고 다른 중복 기록이 있는지 검사
     const duplicateLog = await prisma.weightLog.findFirst({
         where: {
             petId: existingLog.petId,
@@ -111,7 +104,6 @@ const updateWeightLog = async (userId: number, id: number, data: UpdateWeightLog
     });
 };
 
-// 5. 삭제 (소프트 딜리트)
 const deleteWeightLog = async (userId: number, id: number) => {
     await getWeightRecordById(userId, id);
 
@@ -126,7 +118,6 @@ const getWeightLogStats = async (
     petId: number,
     query: { period: "daily" | "weekly" | "monthly"; baseDate: string },
 ) => {
-    // ... 기존 통계 로직과 100% 동일하므로 생략하지 않고 그대로 포함합니다.
     const { period, baseDate } = query;
 
     await checkPetOwnership(userId, petId);

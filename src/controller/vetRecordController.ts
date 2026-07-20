@@ -2,7 +2,6 @@ import { Response } from "express";
 import { AuthRequest } from "../middlewares/auth.ts";
 import vetRecordService from "../service/vetRecordService.ts";
 
-// 1. 병원 기록 생성
 const createVetRecord = async (req: AuthRequest, res: Response) => {
     try {
         if (!req.user) {
@@ -34,7 +33,6 @@ const createVetRecord = async (req: AuthRequest, res: Response) => {
     }
 };
 
-// 2. 특정 반려동물의 전체 병원 기록 조회
 const getVetRecordsByPetId = async (req: AuthRequest<{ petId: string }>, res: Response) => {
     try {
         if (!req.user) {
@@ -65,7 +63,6 @@ const getVetRecordsByPetId = async (req: AuthRequest<{ petId: string }>, res: Re
     }
 };
 
-// 3. 특정 병원 기록 상세 조회
 const getVetRecordById = async (req: AuthRequest<{ id: string }>, res: Response) => {
     try {
         if (!req.user) {
@@ -94,8 +91,6 @@ const getVetRecordById = async (req: AuthRequest<{ id: string }>, res: Response)
     }
 };
 
-// 4. 병원 기록 수정
-// 4. 병원 기록 수정
 const updateVetRecord = async (req: AuthRequest<{ id: string }>, res: Response) => {
     try {
         if (!req.user) {
@@ -126,7 +121,6 @@ const updateVetRecord = async (req: AuthRequest<{ id: string }>, res: Response) 
     }
 };
 
-// 5. 병원 기록 삭제
 const deleteVetRecord = async (req: AuthRequest<{ id: string }>, res: Response) => {
     try {
         if (!req.user) {
@@ -154,7 +148,6 @@ const deleteVetRecord = async (req: AuthRequest<{ id: string }>, res: Response) 
     }
 };
 
-// 맨 아래에서 객체로 묶어 기본 내보내기
 export default {
     createVetRecord,
     getVetRecordsByPetId,

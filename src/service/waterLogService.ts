@@ -4,7 +4,6 @@ import {
     UpdateWaterLogInputType,
 } from "../schemas/waterLog/waterLogSchema.ts";
 
-// 반려동물 소유권 확인
 const checkPetOwnership = async (userId: number, petId: number) => {
     const pet = await prisma.pet.findFirst({
         where: { id: petId, userId, deletedAt: null },
@@ -14,7 +13,6 @@ const checkPetOwnership = async (userId: number, petId: number) => {
     }
 };
 
-// 1. 생성 (중복 체크 삭제 🚀)
 const createWaterLog = async (userId: number, data: CreateWaterLogInputType) => {
     await checkPetOwnership(userId, data.petId);
 
@@ -29,7 +27,6 @@ const createWaterLog = async (userId: number, data: CreateWaterLogInputType) => 
     });
 };
 
-// 2. 반려동물별 전체 조회
 const getWaterLogsByPetId = async (userId: number, petId: number) => {
     await checkPetOwnership(userId, petId);
 
@@ -39,7 +36,6 @@ const getWaterLogsByPetId = async (userId: number, petId: number) => {
     });
 };
 
-// 3. 단일 상세 조회
 const getWaterLogById = async (userId: number, id: number) => {
     const log = await prisma.waterLog.findFirst({
         where: { id, deletedAt: null },
@@ -53,7 +49,6 @@ const getWaterLogById = async (userId: number, id: number) => {
     return log;
 };
 
-// 4. 수정 (중복 체크 삭제 🚀)
 const updateWaterLog = async (userId: number, id: number, data: UpdateWaterLogInputType) => {
     await getWaterLogById(userId, id); // 권한 및 존재 여부만 체크
 
@@ -69,7 +64,6 @@ const updateWaterLog = async (userId: number, id: number, data: UpdateWaterLogIn
     });
 };
 
-// 5. 삭제 (소프트 딜리트)
 const deleteWaterLog = async (userId: number, id: number) => {
     await getWaterLogById(userId, id);
 
@@ -79,7 +73,6 @@ const deleteWaterLog = async (userId: number, id: number) => {
     });
 };
 
-// 6. 통계 (누적 계산 로직 유지)
 const getWaterLogStats = async (
     userId: number,
     petId: number,
@@ -133,7 +126,6 @@ const getWaterLogStats = async (
             key = `${dateObj.getFullYear()}-${String(dateObj.getMonth() + 1).padStart(2, "0")}`;
         }
 
-        // 💡 여기가 핵심! 중복 등록된 데이터들이 여기서 하나의 키(날짜)에 합산(누적)됩니다.
         statsMap[key] = (statsMap[key] || 0) + log.amount;
     });
 

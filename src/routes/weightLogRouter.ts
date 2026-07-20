@@ -6,52 +6,45 @@ import {
     createWeightLogSchema,
     updateWeightLogSchema,
     getWeightLogSchema,
-    deleteWeightLogSchema,
     getWeightLogStatsSchema,
 } from "../schemas/weightLog/weightLogSchema.ts";
 
 const router = Router();
 
-// 1. 몸무게 기록 생성
 router.post(
     "/",
     authenticate,
-    validate(createWeightLogSchema), // 👈 생성 검증 스키마
+    validate(createWeightLogSchema),
     weightLogController.createWeightLog,
 );
 
-// 2. 특정 반려동물의 전체 몸무게 기록 조회
 router.get("/pet/:petId", authenticate, weightLogController.getWeightLogsByPetId);
 
-// 3. 특정 몸무게 기록 상세 조회
 router.get(
     "/:id",
     authenticate,
-    validate(getWeightLogSchema), //  ID 숫자 검증 안전장치[cite: 3]
+    validate(getWeightLogSchema),
     weightLogController.getWeightRecordById,
 );
 
-// 4. 몸무게 기록 수정
 router.put(
     "/:id",
     authenticate,
-    validate(updateWeightLogSchema), //  수정 검증 스키마
+    validate(updateWeightLogSchema),
     weightLogController.updateWeightLog,
 );
 
-// 5. 몸무게 기록 삭제
 router.delete(
     "/:id",
     authenticate,
     weightLogController.deleteWeightLog,
 );
 
-// 몸무게 통계 조회 API
 router.get(
     "/pet/:petId/stats",
     authenticate,
     validate(getWeightLogStatsSchema),
-    weightLogController.getWeightLogStats //  컨트롤러 연결
+    weightLogController.getWeightLogStats
 );
 
 export default router;

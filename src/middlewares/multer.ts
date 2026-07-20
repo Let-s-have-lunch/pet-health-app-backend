@@ -10,7 +10,6 @@ if (!fs.existsSync(uploadDir)) {
 
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
-        // 프로젝트 루트에 'uploads' 폴더를 만들어주세요
         cb(null, uploadDir);
     },
     filename: (req, file, cb) => {
