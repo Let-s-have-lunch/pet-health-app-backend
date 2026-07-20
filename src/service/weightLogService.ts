@@ -2,7 +2,7 @@ import prisma from "../config/prisma.ts";
 import {
     CreateWeightLogInputType,
     UpdateWeightLogInputType,
-} from "../schemas/user/weightLogSchema.ts";
+} from "../schemas/weightLog/weightLogSchema.ts";
 
 // 반려동물 소유권 확인 헬퍼
 const checkPetOwnership = async (userId: number, petId: number) => {

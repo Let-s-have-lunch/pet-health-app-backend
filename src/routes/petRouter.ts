@@ -2,9 +2,9 @@ import { Router } from "express";
 import { validate } from "../middlewares/validate.ts";
 import petController from "../controller/petController.ts";
 import { authenticate } from "../middlewares/auth.ts";
-import { petCreateSchema } from "../schemas/user/pet/petCreateSchema.ts";
+import { petCreateSchema } from "../schemas/pet/petCreateSchema.ts";
 import { upload } from "../middlewares/multer.ts";
-import { petUpdateSchema } from "../schemas/user/pet/petUpdateSchema.ts";
+import { petUpdateSchema } from "../schemas/pet/petUpdateSchema.ts";
 
 const router = Router();
 

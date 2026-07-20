@@ -1,7 +1,7 @@
 import prisma from "../config/prisma.ts";
 import { Prisma } from "../generated/prisma/client.ts";
 import { PetCreateInput } from "../generated/prisma/models/Pet.ts";
-import { PetUpdateInputType } from "../schemas/user/pet/petUpdateSchema.ts";
+import { PetUpdateInputType } from "../schemas/pet/petUpdateSchema.ts";
 
 const getPet = async (userId: number, petId: number) => {
     return prisma.pet.findFirst({

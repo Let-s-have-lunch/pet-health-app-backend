@@ -6,7 +6,7 @@ import {
     getVetRecordSchema,
     UpdateVetRecordSchema,
     CreateVetRecordSchema,
-} from "../schemas/user/vetRecordSchema.ts";
+} from "../schemas/vetRecord/vetRecordSchema.ts";
 import { upload } from "../middlewares/multer.ts";
 const router = Router();
 

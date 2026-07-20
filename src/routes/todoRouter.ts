@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { authenticate } from "../middlewares/auth.ts";
-import { todoSchema } from "../schemas/user/todo/todoSchema.ts";
+import { todoSchema } from "../schemas/todo/todoSchema.ts";
 import { validate } from "../middlewares/validate.ts";
 import todoController from "../controller/todoController.ts";
 

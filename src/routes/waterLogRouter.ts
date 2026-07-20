@@ -7,7 +7,7 @@ import {
     getWaterLogSchema,
     deleteWaterLogSchema,
     getWaterLogStatsSchema,
-} from "../schemas/user/waterLogSchema.ts";
+} from "../schemas/waterLog/waterLogSchema.ts";
 import waterLogController from "../controller/waterLogController.ts";
 
 const router = Router();

@@ -1,5 +1,5 @@
 import prisma from "../config/prisma.ts";
-import { CreateVetRecordInputType } from "../schemas/user/vetRecordSchema.ts";
+import { CreateVetRecordInputType } from "../schemas/vetRecord/vetRecordSchema.ts";
 import { VetRecordCreateInput } from "../generated/prisma/models.ts";
 
 // 반려동물 소유권 확인 (내부 헬퍼 함수)

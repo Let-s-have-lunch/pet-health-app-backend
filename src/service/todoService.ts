@@ -1,5 +1,5 @@
 import prisma from "../config/prisma.ts";
-import { TodoInputType } from "../schemas/user/todo/todoSchema.ts";
+import { TodoInputType } from "../schemas/todo/todoSchema.ts";
 
 const getTodoList = async (userId: number, date: Date) => {
     const startOfDay = new Date(date);

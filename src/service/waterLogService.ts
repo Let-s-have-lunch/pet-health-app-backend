@@ -2,7 +2,7 @@ import prisma from "../config/prisma.ts";
 import {
     CreateWaterLogInputType,
     UpdateWaterLogInputType,
-} from "../schemas/user/waterLogSchema.ts";
+} from "../schemas/waterLog/waterLogSchema.ts";
 
 // 반려동물 소유권 확인
 const checkPetOwnership = async (userId: number, petId: number) => {

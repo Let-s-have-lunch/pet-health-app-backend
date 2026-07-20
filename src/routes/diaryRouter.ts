@@ -1,9 +1,9 @@
 import { Router } from "express";
 import { authenticate } from "../middlewares/auth.ts";
 import { validate } from "../middlewares/validate.ts";
-import { createDiarySchema } from "../schemas/user/diary/createDiarySchema.ts";
+import { createDiarySchema } from "../schemas/diary/createDiarySchema.ts";
 import diaryController from "../controller/diaryController.ts";
-import { updateDiarySchema } from "../schemas/user/diary/updateDiarySchema.ts";
+import { updateDiarySchema } from "../schemas/diary/updateDiarySchema.ts";
 import { upload } from "../middlewares/multer.ts";
 
 const router = Router();

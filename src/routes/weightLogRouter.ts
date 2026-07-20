@@ -8,7 +8,7 @@ import {
     getWeightLogSchema,
     deleteWeightLogSchema,
     getWeightLogStatsSchema,
-} from "../schemas/user/weightLogSchema.ts";
+} from "../schemas/weightLog/weightLogSchema.ts";
 
 const router = Router();
 

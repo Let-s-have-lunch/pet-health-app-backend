@@ -2,7 +2,7 @@ import { Response } from "express";
 import petService from "../service/petService.ts";
 import { PetCreateInput } from "../generated/prisma/models/Pet.ts";
 import { AuthRequest } from "../middlewares/auth.ts";
-import { PetUpdateInputType } from "../schemas/user/pet/petUpdateSchema.ts";
+import { PetUpdateInputType } from "../schemas/pet/petUpdateSchema.ts";
 
 const getPet = async (req: AuthRequest<{ petId: string }>, res: Response) => {
     try {

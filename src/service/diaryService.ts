@@ -1,6 +1,6 @@
-import { CreateDiaryInputType } from "../schemas/user/diary/createDiarySchema.ts";
+import { CreateDiaryInputType } from "../schemas/diary/createDiarySchema.ts";
 import prisma from "../config/prisma.ts";
-import { UpdateDiaryInputType } from "../schemas/user/diary/updateDiarySchema.ts";
+import { UpdateDiaryInputType } from "../schemas/diary/updateDiarySchema.ts";
 
 const createDiary = async (diaryData: CreateDiaryInputType, userId: number) => {
     return prisma.diary.create({

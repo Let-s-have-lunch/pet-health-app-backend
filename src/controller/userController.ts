@@ -3,10 +3,10 @@ import {Request, Response} from "express";
 import { UserCreateInput } from "../generated/prisma/models/User.ts";
 import passwordUtil from "../utils/password/passwordUtil.ts";
 import userService from "../service/userService.ts";
-import { LoginInputType } from "../schemas/user/auth/login.ts";
-import { UpdateUserInputType } from "../schemas/user/auth/updateUserSchema.ts";
-import { UpdatePasswordInputType } from "../schemas/user/auth/updatePasswordSchema.ts";
-import { WithdrawUserInputType } from "../schemas/user/auth/withdrawUser.ts";
+import { LoginInputType } from "../schemas/user/login.ts";
+import { UpdateUserInputType } from "../schemas/user/updateUserSchema.ts";
+import { UpdatePasswordInputType } from "../schemas/user/updatePasswordSchema.ts";
+import { WithdrawUserInputType } from "../schemas/user/withdrawUser.ts";
 
 const getMe = async (req: AuthRequest, res: Response) => {
     if (!req.user) {

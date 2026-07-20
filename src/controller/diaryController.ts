@@ -1,8 +1,8 @@
 import { Response } from "express";
 import { AuthRequest } from "../middlewares/auth.ts";
-import { CreateDiaryInputType } from "../schemas/user/diary/createDiarySchema.ts";
+import { CreateDiaryInputType } from "../schemas/diary/createDiarySchema.ts";
 import diaryService from "../service/diaryService.ts";
-import { UpdateDiaryInputType } from "../schemas/user/diary/updateDiarySchema.ts";
+import { UpdateDiaryInputType } from "../schemas/diary/updateDiarySchema.ts";
 
 const createDiary = async (req: AuthRequest, res: Response) => {
     try {

@@ -1,7 +1,7 @@
 import { Response } from "express";
 import { AuthRequest } from "../middlewares/auth.ts";
 import todoService from "../service/todoService.ts";
-import { TodoInputType } from "../schemas/user/todo/todoSchema.ts";
+import { TodoInputType } from "../schemas/todo/todoSchema.ts";
 
 const getTodoList = async (req: AuthRequest, res: Response) => {
     try {

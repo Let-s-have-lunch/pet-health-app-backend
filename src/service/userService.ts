@@ -1,10 +1,10 @@
 import prisma from "../config/prisma.ts";
 import { UserCreateInput } from "../generated/prisma/models/User.ts";
 import { Prisma } from "../generated/prisma/client.ts";
-import { LoginInputType } from "../schemas/user/auth/login.ts";
+import { LoginInputType } from "../schemas/user/login.ts";
 import passwordUtil from "../utils/password/passwordUtil.ts";
 import jwtUtil from "../utils/jwt/jwtUtil.ts";
-import { UpdateUserInputType } from "../schemas/user/auth/updateUserSchema.ts";
+import { UpdateUserInputType } from "../schemas/user/updateUserSchema.ts";
 
 
 const getUserById = async (id: number) => {
