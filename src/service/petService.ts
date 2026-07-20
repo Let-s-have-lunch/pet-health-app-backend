@@ -48,7 +48,7 @@ const updatePet = async (userId: number, petId: number, input: PetUpdateInputTyp
     const existPet = await prisma.pet.findFirst({
         where: {
             id: petId,
-            userId: userId,
+            userId,
             deletedAt: null,
         },
     });
@@ -57,21 +57,25 @@ const updatePet = async (userId: number, petId: number, input: PetUpdateInputTyp
         throw new Error("PET_NOT_FOUND");
     }
 
+    const updateData: Prisma.PetUpdateInput = {
+        name: input.name,
+        species: input.species,
+        breed: input.breed ?? null,
+        gender: input.gender,
+        neutered: input.neutered,
+        registrationNumber: input.registrationNumber ?? null,
+        birthdate: input.birthdate ? new Date(input.birthdate) : null,
+    };
+
+    if (input.profileImage !== undefined) {
+        updateData.profileImage = input.profileImage;
+    }
+
     return prisma.pet.update({
         where: {
             id: petId,
         },
-        data: {
-                name: input.name,
-                species: input.species,
-                breed: input.breed ?? null,
-                gender: input.gender,
-                neutered: input.neutered,
-                registrationNumber: input.registrationNumber ?? null,
-                profileImage: input.profileImage ?? null,
-
-                birthdate: input.birthdate ? new Date(input.birthdate) : null,
-        },
+        data: updateData,
     });
 };
 
