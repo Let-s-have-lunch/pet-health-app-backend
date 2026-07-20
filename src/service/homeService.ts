@@ -24,10 +24,10 @@ const getPetDashboardWithPromiseAll = async (petId: number, dateStr: string) => 
     );
 
     // 💡 Promise.all을 사용해 4개의 쿼리를 동시에 비동기로 병렬 조회!
-    const [walkCount, latestWeight, waterSum, upcomingVet] = await Promise.all([
+    const [walkCount, latestWeight, waterSum, lastVetVisit] = await Promise.all([
         // 1. 오늘 산책 횟수 카운트
         prisma.walkLog.count({
-            where: { petId, createdAt: { gte: startOfDay, lte: endOfDay } },
+            where: { petId, walkDate: { gte: startOfDay, lte: endOfDay } },
         }),
         // 2. 가장 최근 몸무게 (실제 측정일인 recordDate 기준!)
         prisma.weightLog.findFirst({
@@ -36,13 +36,13 @@ const getPetDashboardWithPromiseAll = async (petId: number, dateStr: string) => 
         }),
         // 3. 오늘 마신 물 총합 합산
         prisma.waterLog.aggregate({
-            where: { petId, deletedAt: null, createdAt: { gte: startOfDay, lte: endOfDay } },
+            where: { petId, deletedAt: null, recordDate: { gte: startOfDay, lte: endOfDay } },
             _sum: { amount: true }, // 스키마에 따라 amount 또는 water 등으로 수정
         }),
         // 4. 예정된 가장 빠른 병원 기록 1개
         prisma.vetRecord.findFirst({
-            where: { petId, deletedAt: null, visitDate: { gte: startOfDay } },
-            orderBy: { visitDate: "asc" },
+            where: { petId, deletedAt: null, visitDate: { lte: endOfDay } },
+            orderBy: { visitDate: "desc" },
         }),
     ]);
 
@@ -60,11 +60,11 @@ const getPetDashboardWithPromiseAll = async (petId: number, dateStr: string) => 
             totalAmount: waterSum._sum?.amount || 0,
             date: dateStr, // 물도 오늘 날짜 기준
         },
-        vetRecord: upcomingVet
+        vetRecord: lastVetVisit
             ? {
-                  time: upcomingVet.visitDate, // 병원은 예약된 시간
-                  purpose: upcomingVet.visitPurpose,
-                  hospitalName: upcomingVet.hospitalName || "미지정 병원",
+                  time: lastVetVisit.visitDate, // 병원은 예약된 시간
+                  purpose: lastVetVisit.visitPurpose,
+                  hospitalName: lastVetVisit.hospitalName || "미지정 병원",
               }
             : null,
     };
