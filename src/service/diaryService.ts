@@ -84,14 +84,21 @@ const updateDiary = async (diaryId: number, userId: number, diaryData: UpdateDia
         return null;
     }
 
+    const updateData: { title: string; content: string; date: Date; diaryImage?: string | null } = {
+        title: diaryData.title,
+        content: diaryData.content,
+        date: diaryData.date,
+    };
+
+    if (diaryData.diaryImage !== undefined) {
+        updateData.diaryImage = diaryData.diaryImage;
+    }
+
     return prisma.diary.update({
         where: {
             id: diaryId,
         },
-        data: {
-            ...diaryData,
-            diaryImage: diaryData.diaryImage ?? null,
-        },
+        data: updateData,
     });
 };
 
